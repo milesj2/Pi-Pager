@@ -21,7 +21,11 @@ class MenuItem:
 
     def __str__(self):
         if self.type == MENU_TYPE_MENU:
-            return f"Menu item {self.name}; type: {self.type}; subitems: {self.subitems}"
+            subitems = "[ "
+            for item in self.subitems:
+                subitems += item.name + ", "
+            subitems += " ]"
+            return f"Menu item {self.name}; type: {self.type}; subitems: {subitems}"
         else:
             return f"Menu item {self.name}; type: {self.type}; action: {self.action}; args = {self.args}"
 
@@ -40,37 +44,12 @@ class Menu:
 
     menu_state = MENU_STATE_DIALOGUE
 
-    items = [
-        MenuItem(MENU_MAIN, MENU_TYPE_MENU, subitems=[
-            MenuItem(MENU_NETWORK, "MENU", subitems=[
-                MenuItem(SUB_MENU_WIFI, "MENU", subitems=[
-                    MenuItem("View Wifi Status", "ACTION", action=_on_action),
-                    MenuItem("Toggle Wifi", "MENU", subitems=[
-                        MenuItem("On", "ACTION", action=_on_action),
-                        MenuItem("Off", "ACTION", action=_on_action),
-                    ]),
-                    MenuItem("Manage Known Networks", "DIALOGUE", action=_on_action),
-                    MenuItem("Reset Wifi", "ACTION", action=_on_action)
-                ]),
-                MenuItem(SUB_MENU_MOBILE, "MENU", subitems=[
-                    MenuItem("View Mobile Status", "ACTION", action=_on_action),
-                    MenuItem("Toggle Mobile (LTE)", "ACTION", action=_on_action),
-                ])
-            ]),
-            MenuItem(MENU_SOUND_VIBRATE, "MENU", subitems=[
-                MenuItem("Sound", "MENU", subitems=[
-                    MenuItem("Toggle Sound", "ACTION", action=_on_action),
-                ]),
-                MenuItem("Vibrate", "MENU", subitems=[
-                    MenuItem("Toggle Vibrate", "ACTION", action=_on_action),
-                ]),
-            ]),
-        ])
+    items = []
 
-    ]
-
-    def __init__(self):
+    def __init__(self, items):
         self._on_action.append(self.fire_action_event)
+        self.items = items
+        self.current_item.append(self.items[0])
 
     def fire_action_event(self):
         self.on_action(self.get_current_item())
@@ -89,8 +68,8 @@ class Menu:
             self.current_item_index = 0
         else:
             # self.on_action(next_item)
-            self.fire_action_event()
-            # next_item.action()
+            # self.fire_action_event()
+            next_item.action()
 
     def deselect_item(self):
         self.current_item.pop()
@@ -117,4 +96,4 @@ class Menu:
         self.current_item_index = 0
 
 
-device_menu = Menu()
+# device_menu = Menu()

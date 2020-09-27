@@ -5,7 +5,9 @@ import time
 from datetime import datetime
 from PIL import ImageFont, Image
 import os
-from system.menu import device_menu
+# from system.menu import device_menu
+
+from helpers.pager_menu import device_menu
 
 from system.globals import *
 
@@ -27,8 +29,8 @@ font = ImageFont.truetype(DIR_FONTS + "century.ttf", 25)
 small_font = ImageFont.truetype(DIR_FONTS + "century.ttf", 20)
 
 
-def handle_aciton(name):
-    print("got action type", name)
+def handle_action(name):
+    print("Got action type", name)
 
 
 def exit_menu():
@@ -38,7 +40,7 @@ def exit_menu():
 
 
 device_menu.on_menu_exit.append(exit_menu)
-device_menu.on_action.append(handle_aciton)
+device_menu.on_action.append(handle_action)
 
 
 def start():
@@ -46,20 +48,18 @@ def start():
         with canvas(device) as draw:
             if device_state.get_state() == STATE_ACTIVE_ALERT:
                 display_alert(draw)
-            elif device_state.get_state() == STATE_MENU:
-                display_wifi(draw)
-                display_time(draw)
+                continue
+            display_wifi(draw)
+            display_time(draw)
+            if device_state.get_state() == STATE_MENU:
                 display_menu(draw)
             else:
-                display_wifi(draw)
-                display_text(draw)
                 display_time(draw)
             time.sleep(0.2)
 
 
 def display_menu(draw):
     global _display_text_value, refreshing
-
     _display_text_value = device_menu.get_current_menu().subitems[device_menu.current_item_index].name
     display_text(draw)
     refreshing = False

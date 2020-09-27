@@ -14,31 +14,31 @@ LAN = "eth0"
 on_connection_status_update = system.events.Event()
 
 
-interfaces = {}
-
-
 def start():
+    interfaces = {}
     Log.info(TAG, "Starting Network Manager")
     while True:
+        # FIXME: should this skip?
         if device_state.get_state() == STATE_ACTIVE_ALERT:
             time.sleep(5)
             continue
-        counter = 0
+        connected_interfaces = 0
         Log.debug(TAG, "Looking for connected devices")
         if_addrs = psutil.net_if_addrs()
         for interface_name, interface_addresses in if_addrs.items():
-            interfaces[interface_name] = False
             Log.debug(TAG, f"Found device: {interface_name}")
+            interfaces[interface_name] = False
             for address in interface_addresses:
                 Log.debug(TAG, f"|-- {str(address.family)} | {address.address}")
                 if str(address.family) != 'AddressFamily.AF_INET':
                     continue
                 if address.address == ADDRESS_LOCAL:
                     continue
-                counter += 1
+                connected_interfaces += 1
                 interfaces[interface_name] = True
-        Log.debug(TAG, f"Out of {len(if_addrs.items()) - 1} interfaces, {counter} were connected.")
-        if counter > 0:
+        Log.debug(TAG, f"Out of {len(if_addrs.items()) - 1} interfaces, {connected_interfaces} were connected.")
+        if connected_interfaces > 0:
+            # TODO: get wifi strength
             status = "high"
         else:
             Log.warn(TAG, "Device has no connected interfaces!")

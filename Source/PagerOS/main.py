@@ -3,7 +3,8 @@ import threading
 from system.globals import *
 from helpers.config import Config
 from helpers.kojin_logging import Log
-from system.menu import device_menu
+# from system.menu import device_menu
+from helpers.pager_menu import device_menu
 import workers.display as display
 import time
 import os
@@ -79,12 +80,8 @@ def main():
         time.sleep(10)
 
 
-def start_networking_thread():
-    t_net = threading.Thread(target=networking.start)
-    t_net.start()
-
-
 def set_display_refreshing_if_false():
+    # fixme: what is this? This is an awful name
     if display.refreshing:
         return True
     else:
@@ -98,11 +95,16 @@ def set_display_refreshing_if_false():
 
 
 def handle_menu_action(menu_item):
-
     pass
 
 
 def handle_connection_status_update(status):
+    """ Gets a status update and updates display
+
+     Args:
+         status (str) : status of connection
+    """
+    device_state.networking.set_wifi_status(status)
     display._wifi_strength = status
 
 
@@ -151,7 +153,12 @@ def handle_right_button_press():
 
 
 def handle_alert(alert):
-    """ Event handler for receiving alert from networking """
+    """ Event handler for receiving alert from networking
+
+    Args:
+        alert (system.classes.Alert) : alert class with all attributes of current alert
+
+    """
     global current_alert
     current_alert = alert
     display.set_display_text(alert.type)
@@ -166,18 +173,28 @@ def handle_alert(alert):
 
 
 def handle_update_alert_status(status):
-    """ Event handler for receiving gpio input during alerting state """
+    """ Event handler for receiving gpio input during alerting state
+
+    Args:
+        status (str) : acknowledged/dismissed etc to send to the api
+
+    """
     Log.info(TAG, "Acknowledge alert.")
+    # FIXME: Change this to update device state?
     gpio.acknowledged = True
     if current_alert is not None:
         networking.update_alert_status(current_alert.id, status)
+
+    # FIXME: delete this next line?
     gpio.on_update_alert_status.clear()
+
     Log.info(TAG, f"Setting device state to {STATE_IDLE}.")
     device_state.set_state(STATE_IDLE)
     display.clear_display_text()
 
 
 def handle_shut_down():
+    """ Shuts down the pager gracefully """
     Config.graceful_exit(True)
     os.system('sudo shutdown now')
 

@@ -10,11 +10,15 @@ class DeviceState:
 
     class _Networking:
 
-        _status = STRING_EMPTY
+        _wifi_status = STRING_EMPTY
         _api_status = STRING_EMPTY
 
-        def get_network_status(self):
-            pass
+        def get_wifi_status(self):
+            return self._wifi_status
+
+        def set_wifi_status(self, status):
+            # assert status is bool
+            self._wifi_status = status
 
         def get_current_wifi(self):
             pass

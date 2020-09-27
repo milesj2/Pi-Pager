@@ -13,7 +13,9 @@ on_reset_wifi = Event()
 
 
 def view_wifi():
-    pass
+    view_wifi_item = device_menu.get_current_menu().subitems[device_menu.current_item_index]
+    view_wifi_item.subitems[0].name = "WIFI STATUS GOES BRRRR"
+    device_menu.current_item.append(view_wifi_item)
 
 
 def toggle_wifi():
@@ -28,27 +30,31 @@ def reset_wifi():
     pass
 
 
+def action_empty():
+    pass
+
+
 def action_unimplemented():
     Log.error(TAG, "Action not implemented!")
 
 
-menu = Menu()
-
-menu.items = [
+items = [
     MenuItem(MENU_MAIN, MENU_TYPE_MENU, subitems=[
                 MenuItem(MENU_NETWORK, "MENU", subitems=[
                     MenuItem(SUB_MENU_WIFI, "MENU", subitems=[
-                        MenuItem("View Wifi Status", "ACTION", action=view_wifi),
+                        MenuItem("View Wifi Status", MENU_TYPE_ACTION, action=view_wifi, subitems=[
+                            MenuItem("STRING_EMPTY", MENU_TYPE_ACTION, action=action_empty)
+                        ]),
                         MenuItem("Toggle Wifi", "MENU", subitems=[
-                            MenuItem("On", "ACTION", action=action_unimplemented),
-                            MenuItem("Off", "ACTION", action=action_unimplemented),
+                            MenuItem("On", MENU_TYPE_ACTION, action=action_unimplemented),
+                            MenuItem("Off", MENU_TYPE_ACTION, action=action_unimplemented),
                         ]),
                         MenuItem("Manage Known Networks", "DIALOGUE", action=action_unimplemented),
-                        MenuItem("Reset Wifi", "ACTION", action=reset_wifi)
+                        MenuItem("Reset Wifi", MENU_TYPE_ACTION, action=reset_wifi)
                     ]),
                     MenuItem(SUB_MENU_MOBILE, "MENU", subitems=[
-                        MenuItem("View Mobile Status", "ACTION", action=action_unimplemented),
-                        MenuItem("Toggle Mobile (LTE)", "ACTION", action=action_unimplemented),
+                        MenuItem("View Mobile Status", MENU_TYPE_ACTION, action=action_unimplemented),
+                        MenuItem("Toggle Mobile (LTE)", MENU_TYPE_ACTION, action=action_unimplemented),
                     ])
                 ]),
                 MenuItem(MENU_SOUND_VIBRATE, "MENU", subitems=[
@@ -62,3 +68,4 @@ menu.items = [
         ])
 ]
 
+device_menu = Menu(items)
