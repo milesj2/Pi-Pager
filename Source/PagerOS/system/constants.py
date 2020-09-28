@@ -12,6 +12,7 @@ INI_HEADER_PAGER = "pager"
 INI_HEADER_KOJIN_API = "kojin_api"
 INI_HEADER_USER = "user"
 INI_HEADER_LOGGING = "logging"
+INI_HEADER_DEVICE = "device"
 
 INI_KEY_SERIAL = "serial"
 INI_KEY_GRACEFUL_EXIT = "graceful_exit"
@@ -21,6 +22,9 @@ INI_KEY_STATION = "station"
 INI_KEY_LOGGING_LEVEL = "logging_level"
 INI_KEY_GPIO_WARNINGS = "gpio_warnings"
 INI_KEY_DEBUG = "debug"
+INI_KEY_WIFI = "wifi"
+INI_KEY_BLUETOOTH = "bluetooth"
+INI_KEY_CELLULAR = "cellular"
 
 URL_PARAM_ACCESS_TOKEN = "accessToken"
 URL_PARAM_ALERT_ID = "alertID"
@@ -84,3 +88,4 @@ SUB_MENU_MOBILE = MENU_NETWORK + "_MOBILE"
 
 ENABLED = "ENABLED"
 DISABLED = -1
+NO_SIGNAL = 0

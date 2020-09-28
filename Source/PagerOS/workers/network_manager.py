@@ -3,6 +3,7 @@ import time
 import system.events
 from helpers.kojin_logging import Log
 from system.globals import *
+from helpers.config import Config
 
 TAG = "network_manger"
 
@@ -19,7 +20,8 @@ def start():
     Log.info(TAG, "Starting Network Manager")
     while True:
         # FIXME: should this skip?
-        if device_state.get_state() == STATE_ACTIVE_ALERT or device_state.networking.get_wifi_status() == DISABLED:
+        # if device_state.get_state() == STATE_ACTIVE_ALERT or device_state.networking.get_wifi_status() == DISABLED:
+        if device_state.get_state() == STATE_ACTIVE_ALERT or not Config.get_wifi():
             Log.debug(TAG, f"Wifi disabled, skipping status check.")
             time.sleep(5)
             continue

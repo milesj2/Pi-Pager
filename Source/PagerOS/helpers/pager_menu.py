@@ -1,5 +1,6 @@
 from system.globals import *
 from helpers.kojin_logging import Log
+from helpers.config import Config
 
 
 TAG = "Pager Menu"
@@ -17,7 +18,10 @@ def view_wifi():
 
 
 def toggle_wifi():
-    pass
+    print(Config.get_wifi())
+    print(not Config.get_wifi())
+    Config.set_wifi(not Config.get_wifi())
+    print(Config.get_wifi())
 
 
 def manage_wifi():
@@ -43,10 +47,11 @@ items = [
                         MenuItem("View Wifi Status", MENU_TYPE_ACTION, action=view_wifi, subitems=[
                             MenuItem("STRING_EMPTY", MENU_TYPE_ACTION, action=action_empty)
                         ]),
-                        MenuItem("Toggle Wifi", "MENU", subitems=[
-                            MenuItem("On", MENU_TYPE_ACTION, action=action_unimplemented),
-                            MenuItem("Off", MENU_TYPE_ACTION, action=action_unimplemented),
-                        ]),
+                        # MenuItem("Toggle Wifi", "MENU", subitems=[
+                        #    MenuItem("On", MENU_TYPE_ACTION, action=action_unimplemented),
+                        #    MenuItem("Off", MENU_TYPE_ACTION, action=action_unimplemented),
+                        # ]),
+                        MenuItem("Toggle Wifi", MENU_TYPE_ACTION, action=toggle_wifi),
                         MenuItem("Manage Known Networks", "DIALOGUE", action=action_unimplemented),
                         MenuItem("Reset Wifi", MENU_TYPE_ACTION, action=reset_wifi)
                     ]),

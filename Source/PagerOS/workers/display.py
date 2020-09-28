@@ -6,7 +6,7 @@ from datetime import datetime
 from PIL import ImageFont, Image
 import os
 # from system.menu import device_menu
-
+from helpers.config import Config
 from helpers.pager_menu import device_menu
 
 from system.globals import *
@@ -114,7 +114,10 @@ def display_alert(draw):
 
 
 def display_wifi(draw):
-    status = device_state.networking.get_wifi_status()
+    if Config.get_wifi():
+        status = device_state.networking.get_wifi_status()
+    else:
+        status = DISABLED
     im = f"{DIR_ICO}wifi_{status}.png"
     # FIXME: try/except statement only in to prevent status returning blank and image not being found.
     #       This makes no sense.
@@ -125,7 +128,11 @@ def display_wifi(draw):
 
 
 def display_cellular(draw):
-    draw_image(draw, f"{DIR_ICO}cellular_{device_state.networking.get_cellular_status()}.png", 24, 0)
+    if Config.get_cellular():
+        status = device_state.networking.get_cellular_status()
+    else:
+        status = DISABLED
+    draw_image(draw, f"{DIR_ICO}cellular_{status}.png", 24, 0)
 
 
 def draw_image(draw, path, x, y):

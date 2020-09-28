@@ -33,7 +33,7 @@ def main():
     Config.graceful_exit(False)
     Config.save_state()
 
-    device_state.networking.set_cellular_status(DISABLED)
+    # device_state.networking.set_cellular_status(DISABLED)
 
     # setup networking, GPIO and bluetooth handlers
     t_net = threading.Thread(target=networking.start)
@@ -81,6 +81,10 @@ def main():
         if not t_net_manager.is_alive():
             Log.warn(TAG, "Network manager thread has died. Restarting...")
             t_net_manager = threading.Thread(target=network_manager.start)
+            t_net_manager.start()
+        if not t_location.is_alive():
+            Log.warn(TAG, "Location thread has died. Restarting...")
+            t_net_manager = threading.Thread(target=location.start)
             t_net_manager.start()
         time.sleep(10)
 
