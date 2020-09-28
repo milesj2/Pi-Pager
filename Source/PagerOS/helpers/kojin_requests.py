@@ -3,7 +3,7 @@ from system.constants import *
 from helpers.kojin_logging import Log
 
 
-TAG = "Requests"
+TAG = "Kojin_Requests"
 
 
 class StdResponse:
@@ -17,10 +17,6 @@ class StdResponse:
 
 
 # deserializers
-def deserialize_alert(dct):
-    return Alert(dct['id'], dct['shoutID'], dct['pagerID'], dct['stationID'], dct['type'])
-
-
 def deserialize_response(dct):
     return StdResponse(dct['status'], dct['message'])
 
@@ -40,7 +36,10 @@ def http_get(url, params):
         Log.error(TAG, "Connection Error for request:\n" + e.request.url + "\n" + str(e.args))
     except Exception as e:
         print("Now really panic!")
-        Log.error(TAG, "General http get error!\n" + e)
+        Log.error(TAG, "General http get error!\n" + str(e))
     # update_connection_status(CONNECTION_STATUS_DISCONNECTED)
     # set_state(STATE_DISCONNECTED)
     return None
+
+
+

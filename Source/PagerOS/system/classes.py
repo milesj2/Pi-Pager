@@ -12,6 +12,18 @@ class Alert(object):
         self.type = alert_type
 
 
+class LongLat:
+    def __init__(self, long, lat):
+        self.long = long
+        self.lat = lat
+
+
+class Location:
+    def __init__(self, gps_loc: LongLat, wifi_loc: LongLat):
+        self.gps = gps_loc
+        self.wifi = wifi_loc
+
+
 class MenuItem:
     name = consts.STRING_EMPTY
     subitems = []

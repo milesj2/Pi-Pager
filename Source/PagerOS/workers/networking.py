@@ -69,5 +69,17 @@ def update_alert_status(alert_id, status):
     return True
 
 
+def on_update_location(location: Location):
+    params = {
+        URL_PARAM_ACCESS_TOKEN: Config.get_access_token(),
+        URL_PARAM_ALERT_ID: location.gps,
+        URL_PARAM_STATUS: location.wifi
+    }
+    Log.info(TAG, f"Updating location gps: {location.gps.long}, {location.gps.lat} | "
+                  f"wifi: {location.wifi.long}, {location.wifi.lat}.")
+    # response = http_get(URL_KOJIN_API + URL_ROUTE_KOJIN_API_ACKNOWLEDGE_ALERT, params)
+    # Log.info(TAG, f"Response from server (code: {response.status}): {response.message}")
+
+
 if __name__ == '__main__':
     start()

@@ -8,7 +8,7 @@ import workers.display as display
 import time
 import os
 
-from workers import gpio, networking, network_manager
+from workers import gpio, networking, network_manager, location
 
 # Constants
 TAG = "main"
@@ -37,6 +37,7 @@ def main():
 
     # setup networking, GPIO and bluetooth handlers
     t_net = threading.Thread(target=networking.start)
+    t_location = threading.Thread(target=location.start)
     t_gpio = threading.Thread(target=gpio.start)
     t_net_manager = threading.Thread(target=network_manager.start)
     t_display = threading.Thread(target=display.start)
@@ -48,6 +49,8 @@ def main():
 
     network_manager.on_connection_status_update.append(handle_connection_status_update)
 
+    location.on_update_location.append(networking.on_update_location)
+
     gpio.on_shutdown_signal_received.append(handle_shut_down)
     gpio.on_main_button_press.append(handle_main_button_press)
     gpio.on_negative_button_press.append(handle_negative_button_press)
@@ -58,6 +61,7 @@ def main():
     t_gpio.start()
     t_net_manager.start()
     t_display.start()
+    t_location.start()
     # t_bluetooth.start()
 
     Log.info(TAG, "Finished setup.")

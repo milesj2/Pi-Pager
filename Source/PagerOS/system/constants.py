@@ -31,11 +31,17 @@ LOGGING_LEVEL_VERBOSE = "VERBOSE"
 LOGGING_LEVEL_STRICT = "STRICT"
 LOGGING_LEVEL_OFF = "OFF"
 
+LOCATION_API_KEY = "39b1f9fa418376"
+
 URL_KOJIN_API = "https://firepager.meinserver.ga/"
 # URL_KOJIN_API = "https://BADURL/"
+URL_LOCATION_API = "https://eu1.unwiredlabs.com/v2/"
 
 URL_ROUTE_KOJIN_API_GET_ALERT = "api/shouts/pager"
 URL_ROUTE_KOJIN_API_ACKNOWLEDGE_ALERT = "api/shouts/pager/status"
+URL_ROUTE_KOJIN_API_UPDATE_LOCATION = "api/pager/location/update"
+
+URL_ROUTE_LOCATION_API_LOCATION = "process.php"
 
 RESPONSE_STATUS_ERROR = "error"
 RESPONSE_STATUS_SUCCESS = "success"
