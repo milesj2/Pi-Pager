@@ -1,5 +1,3 @@
-from system.classes import *
-
 PAGER_VERSION = "v0.1_ALPHA"
 
 DIR_RES = "/home/pi/pager/res/"
@@ -54,7 +52,7 @@ ALERT_STATUS_TIMED_OUT = "TimeOut"
 ALERTER_TIMEOUT = 25
 
 STRING_EMPTY = ""
-ALERT_EMPTY = Alert("", "", "", "", "")
+# ALERT_EMPTY = classes.Alert("", "", "", "", "")
 
 STATE_INITIALISING = "INITIALISING"
 STATE_DISCONNECTED = "DISCONNECTED"
@@ -77,3 +75,6 @@ MENU_RESET = "Reset"
 
 SUB_MENU_WIFI = MENU_NETWORK + "_WIFI"
 SUB_MENU_MOBILE = MENU_NETWORK + "_MOBILE"
+
+ENABLED = "ENABLED"
+DISABLED = -1

@@ -3,7 +3,6 @@ import threading
 from system.globals import *
 from helpers.config import Config
 from helpers.kojin_logging import Log
-# from system.menu import device_menu
 from helpers.pager_menu import device_menu
 import workers.display as display
 import time
@@ -33,6 +32,8 @@ def main():
 
     Config.graceful_exit(False)
     Config.save_state()
+
+    device_state.networking.set_cellular_status(DISABLED)
 
     # setup networking, GPIO and bluetooth handlers
     t_net = threading.Thread(target=networking.start)
@@ -105,7 +106,6 @@ def handle_connection_status_update(status):
          status (str) : status of connection
     """
     device_state.networking.set_wifi_status(status)
-    display._wifi_strength = status
 
 
 def handle_main_button_press():

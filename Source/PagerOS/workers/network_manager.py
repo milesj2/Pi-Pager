@@ -19,7 +19,8 @@ def start():
     Log.info(TAG, "Starting Network Manager")
     while True:
         # FIXME: should this skip?
-        if device_state.get_state() == STATE_ACTIVE_ALERT:
+        if device_state.get_state() == STATE_ACTIVE_ALERT or device_state.networking.get_wifi_status() == DISABLED:
+            Log.debug(TAG, f"Wifi disabled, skipping status check.")
             time.sleep(5)
             continue
         connected_interfaces = 0
@@ -39,10 +40,10 @@ def start():
         Log.debug(TAG, f"Out of {len(if_addrs.items()) - 1} interfaces, {connected_interfaces} were connected.")
         if connected_interfaces > 0:
             # TODO: get wifi strength
-            status = "high"
+            status = 3
         else:
-            Log.warn(TAG, "Device has no connected interfaces!")
-            status = "no"
-        Log.debug(TAG, "Raising event on_connection_status_update with status: " + status)
+            Log.debug(TAG, "Device has no connected interfaces!")
+            status = 0
+        Log.debug(TAG, f"Raising event on_connection_status_update with status: {status}")
         on_connection_status_update(status)
         time.sleep(30)

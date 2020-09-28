@@ -16,7 +16,6 @@ TAG = "Display"
 refreshing = False
 
 _display_text_value = ""
-_wifi_strength = "no"
 text_pos = 0
 flip = -1
 
@@ -51,6 +50,7 @@ def start():
                 continue
             display_wifi(draw)
             display_time(draw)
+            display_cellular(draw)
             if device_state.get_state() == STATE_MENU:
                 display_menu(draw)
             else:
@@ -59,10 +59,11 @@ def start():
 
 
 def display_menu(draw):
-    global _display_text_value, refreshing
-    _display_text_value = device_menu.get_current_menu().subitems[device_menu.current_item_index].name
+    current_menu_text = device_menu.get_current_menu().subitems[device_menu.current_item_index].name
+    if current_menu_text != _display_text_value:
+        set_display_text(current_menu_text)
     display_text(draw)
-    refreshing = False
+    set_refreshing(False)
 
 
 def make_font(name, size):
@@ -73,15 +74,15 @@ def make_font(name, size):
 
 
 def set_display_text(text):
-    global _display_text_value, current_index
+    global _display_text_value, text_pos
     _display_text_value = text
-    current_index = 0
+    text_pos = 0
 
 
 def clear_display_text():
-    global _display_text_value, current_index
+    global _display_text_value, text_pos
     _display_text_value = ""
-    current_index = 0
+    text_pos = 0
 
 
 def display_time(draw):
@@ -109,10 +110,22 @@ def display_alert(draw):
     else:
         draw.text((16, 32), text=_display_text_value, font=font, fill="white")
     flip *= -1
+    time.sleep(0.2)
 
 
 def display_wifi(draw):
-    draw_image(draw, f"{DIR_ICO}wifi_{_wifi_strength}.png", 0, 0)
+    status = device_state.networking.get_wifi_status()
+    im = f"{DIR_ICO}wifi_{status}.png"
+    # FIXME: try/except statement only in to prevent status returning blank and image not being found.
+    #       This makes no sense.
+    try:
+        draw_image(draw, im, 0, 0)
+    except:
+        print("ERROR:", im, status)
+
+
+def display_cellular(draw):
+    draw_image(draw, f"{DIR_ICO}cellular_{device_state.networking.get_cellular_status()}.png", 24, 0)
 
 
 def draw_image(draw, path, x, y):
@@ -126,10 +139,6 @@ def draw_image(draw, path, x, y):
         for j in range(0, image.height):
             if pixel_map[i, j] == 255:
                 draw.point((i + x, j + y), "white")
-
-
-def test_action():
-    print("Test action")
 
 
 def is_refresh():

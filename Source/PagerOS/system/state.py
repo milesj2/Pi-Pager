@@ -10,18 +10,24 @@ class DeviceState:
 
     class _Networking:
 
-        _wifi_status = STRING_EMPTY
+        _wifi_status = 0
+        _cellular_status = DISABLED
         _api_status = STRING_EMPTY
 
         def get_wifi_status(self):
             return self._wifi_status
 
         def set_wifi_status(self, status):
-            # assert status is bool
             self._wifi_status = status
 
         def get_current_wifi(self):
             pass
+
+        def get_cellular_status(self):
+            return self._cellular_status
+
+        def set_cellular_status(self, status):
+            self._cellular_status = status
 
         def set_api_status(self, status):
             self._api_status = status

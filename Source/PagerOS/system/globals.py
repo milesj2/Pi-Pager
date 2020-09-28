@@ -1,10 +1,12 @@
-from system import state
 from system.constants import *
+from system.classes import Alert, MenuItem, Menu, ALERT_EMPTY
+from system.events import Event
+from system.state import DeviceState
 
 
 # current_alert = ALERT_EMPTY
 
-device_state = state.DeviceState()
+device_state = DeviceState()
 
 
 def parse_bool(str_bool):
