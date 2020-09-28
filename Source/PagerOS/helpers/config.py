@@ -4,77 +4,58 @@ from system.constants import *
 import system.globals as glob
 
 
-_config_parser = configparser.ConfigParser()
-_config_parser.read(os.getcwd() + "/" + CONFIG_FILE)
-
-
 class Config:
+    def __init__(self):
+        self._config_parser = configparser.ConfigParser()
+        self._config_parser.read(os.getcwd() + "/" + CONFIG_FILE)
 
-    @staticmethod
-    def save_state():
-        file = open(os.getcwd() + CONFIG_FILE, "w+")
-        print(os.getcwd() + "/" + CONFIG_FILE)
-        # print(file.read())
-        _config_parser.write(file)
-        file.close()
+    def save_state(self):
+        with open(os.getcwd() + CONFIG_FILE, "w+") as file:
+            self._config_parser.write(file)
+            file.close()
 
-    @staticmethod
-    def graceful_exit(value=STRING_EMPTY):
+    def graceful_exit(self, value=STRING_EMPTY):
         if value == STRING_EMPTY:
-            return glob.parse_bool(_config_parser[INI_HEADER_PAGER][INI_KEY_GRACEFUL_EXIT])
+            return glob.parse_bool(self._config_parser[INI_HEADER_PAGER][INI_KEY_GRACEFUL_EXIT])
         else:
-            _config_parser.set(INI_HEADER_PAGER, INI_KEY_GRACEFUL_EXIT, str(value))
+            self._config_parser.set(INI_HEADER_PAGER, INI_KEY_GRACEFUL_EXIT, str(value))
 
-    @staticmethod
-    def get_user_name():
-        return _config_parser[INI_HEADER_USER][INI_KEY_NAME]
+    def get_user_name(self):
+        return self._config_parser[INI_HEADER_USER][INI_KEY_NAME]
 
-    @staticmethod
-    def get_user_station():
-        return _config_parser[INI_HEADER_USER][INI_KEY_STATION]
+    def get_user_station(self):
+        return self._config_parser[INI_HEADER_USER][INI_KEY_STATION]
 
-    @staticmethod
-    def get_access_token():
-        return _config_parser[INI_HEADER_KOJIN_API][INI_KEY_ACCESS_TOKEN]
+    def get_access_token(self):
+        return self._config_parser[INI_HEADER_KOJIN_API][INI_KEY_ACCESS_TOKEN]
 
-    @staticmethod
-    def get_logging_level():
-        return _config_parser[INI_HEADER_LOGGING][INI_KEY_LOGGING_LEVEL]
+    def get_logging_level(self):
+        return self._config_parser[INI_HEADER_LOGGING][INI_KEY_LOGGING_LEVEL]
 
-    @staticmethod
-    def get_gpio_warnings_enabled():
-        return glob.parse_bool(_config_parser[INI_HEADER_LOGGING][INI_KEY_GPIO_WARNINGS])
+    def get_gpio_warnings_enabled(self):
+        return glob.parse_bool(self._config_parser[INI_HEADER_LOGGING][INI_KEY_GPIO_WARNINGS])
 
-    @staticmethod
-    def get_debug():
-        return glob.parse_bool(_config_parser[INI_HEADER_LOGGING][INI_KEY_DEBUG])
+    def get_debug(self):
+        return glob.parse_bool(self._config_parser[INI_HEADER_LOGGING][INI_KEY_DEBUG])
 
-    @staticmethod
-    def get_wifi():
-        return glob.parse_bool(_config_parser[INI_HEADER_DEVICE][INI_KEY_WIFI])
+    def get_wifi(self):
+        return glob.parse_bool(self._config_parser[INI_HEADER_DEVICE][INI_KEY_WIFI])
 
-    @staticmethod
-    def set_wifi(value):
-        print(value)
-        _config_parser.set(INI_HEADER_PAGER, INI_KEY_WIFI, str(value))
-        print(Config.get_wifi())
-        Config.save_state()
+    def set_wifi(self, value):
+        self._config_parser.set(INI_HEADER_DEVICE, INI_KEY_WIFI, str(value))
 
-    @staticmethod
-    def get_cellular():
-        return glob.parse_bool(_config_parser[INI_HEADER_DEVICE][INI_KEY_CELLULAR])
+    def get_cellular(self):
+        return glob.parse_bool(self._config_parser[INI_HEADER_DEVICE][INI_KEY_CELLULAR])
 
-    @staticmethod
-    def set_cellular(value):
-        _config_parser.set(INI_HEADER_PAGER, INI_KEY_CELLULAR, str(value))
-        Config.save_state()
+    def set_cellular(self, value):
+        self._config_parser.set(INI_HEADER_DEVICE, INI_KEY_CELLULAR, str(value))
 
-    @staticmethod
-    def get_bluetooth():
-        return glob.parse_bool(_config_parser[INI_HEADER_DEVICE][INI_KEY_BLUETOOTH])
+    def get_bluetooth(self):
+        return glob.parse_bool(self._config_parser[INI_HEADER_DEVICE][INI_KEY_BLUETOOTH])
 
-    @staticmethod
-    def set_bluetooth(value):
-        _config_parser.set(INI_HEADER_PAGER, INI_KEY_BLUETOOTH, str(value))
-        Config.save_state()
+    def set_bluetooth(self, value):
+        self._config_parser.set(INI_HEADER_DEVICE, INI_KEY_BLUETOOTH, str(value))
 
+
+
+config = Config()

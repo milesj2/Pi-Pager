@@ -1,6 +1,6 @@
 from system.globals import *
 from helpers.kojin_logging import Log
-from helpers.config import Config
+from helpers.config import config
 
 
 TAG = "Pager Menu"
@@ -18,10 +18,8 @@ def view_wifi():
 
 
 def toggle_wifi():
-    print(Config.get_wifi())
-    print(not Config.get_wifi())
-    Config.set_wifi(not Config.get_wifi())
-    print(Config.get_wifi())
+    config.set_wifi(not config.get_wifi())
+    config.save_state()
 
 
 def manage_wifi():
@@ -32,8 +30,19 @@ def reset_wifi():
     pass
 
 
+def view_cellular():
+    view_cellular_item = device_menu.get_current_menu().subitems[device_menu.current_item_index]
+    view_cellular_item.subitems[0].name = "CELLULAR STATUS GOES BRRRR"
+    device_menu.current_item.append(view_cellular_item)
+
+
+def toggle_cellular():
+    config.set_cellular(not config.get_cellular())
+    config.save_state()
+
+
 def action_empty():
-    pass
+    Log.debug(TAG, "Empty action triggered")
 
 
 def action_unimplemented():
@@ -43,21 +52,19 @@ def action_unimplemented():
 items = [
     MenuItem(MENU_MAIN, MENU_TYPE_MENU, subitems=[
                 MenuItem(MENU_NETWORK, "MENU", subitems=[
-                    MenuItem(SUB_MENU_WIFI, "MENU", subitems=[
+                    MenuItem("Wifi", "MENU", subitems=[
                         MenuItem("View Wifi Status", MENU_TYPE_ACTION, action=view_wifi, subitems=[
                             MenuItem("STRING_EMPTY", MENU_TYPE_ACTION, action=action_empty)
                         ]),
-                        # MenuItem("Toggle Wifi", "MENU", subitems=[
-                        #    MenuItem("On", MENU_TYPE_ACTION, action=action_unimplemented),
-                        #    MenuItem("Off", MENU_TYPE_ACTION, action=action_unimplemented),
-                        # ]),
                         MenuItem("Toggle Wifi", MENU_TYPE_ACTION, action=toggle_wifi),
                         MenuItem("Manage Known Networks", "DIALOGUE", action=action_unimplemented),
                         MenuItem("Reset Wifi", MENU_TYPE_ACTION, action=reset_wifi)
                     ]),
-                    MenuItem(SUB_MENU_MOBILE, "MENU", subitems=[
-                        MenuItem("View Mobile Status", MENU_TYPE_ACTION, action=action_unimplemented),
-                        MenuItem("Toggle Mobile (LTE)", MENU_TYPE_ACTION, action=action_unimplemented),
+                    MenuItem("Cellular/Mobile", "MENU", subitems=[
+                        MenuItem("View Mobile Status", MENU_TYPE_ACTION, action=view_cellular, subitems=[
+                            MenuItem("STRING_EMPTY", MENU_TYPE_ACTION, action=action_empty)
+                        ]),
+                        MenuItem("Toggle Mobile (LTE)", MENU_TYPE_ACTION, action=toggle_cellular),
                     ])
                 ]),
                 MenuItem(MENU_SOUND_VIBRATE, "MENU", subitems=[

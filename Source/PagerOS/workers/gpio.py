@@ -2,7 +2,7 @@ import time
 import datetime
 import RPi.GPIO as GPIO
 from system.globals import *
-from helpers.config import Config
+from helpers.config import config
 from helpers.kojin_logging import Log
 from system.events import Event
 
@@ -33,8 +33,8 @@ acknowledged = False
 
 
 def start():
-    Log.info(TAG, f"Show GPIO warnings set to {Config.get_gpio_warnings_enabled()}.")
-    GPIO.setwarnings(Config.get_gpio_warnings_enabled())
+    Log.info(TAG, f"Show GPIO warnings set to {config.get_gpio_warnings_enabled()}.")
+    GPIO.setwarnings(config.get_gpio_warnings_enabled())
     GPIO.setmode(GPIO.BCM)
 
     GPIO.setup(PIN_BUZZER, GPIO.OUT)

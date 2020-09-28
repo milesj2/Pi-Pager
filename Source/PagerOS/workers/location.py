@@ -4,7 +4,7 @@ from system.constants import *
 from system.globals import device_state
 from system.events import Event
 from helpers.kojin_logging import Log
-from helpers.config import Config
+from helpers.config import config
 import helpers.location_requests as k_requests
 
 
@@ -18,7 +18,7 @@ def start():
         Log.info(TAG, "Handling location stuff.")
         wifi = LongLat("", "")
         # if device_state.networking.get_wifi_status() != DISABLED:
-        if Config.get_wifi():
+        if config.get_wifi():
             wifi = get_wifi_location()
         gps = get_gps_location()
         loc = Location(gps, wifi)

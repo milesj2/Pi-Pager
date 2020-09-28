@@ -6,7 +6,7 @@ from datetime import datetime
 from PIL import ImageFont, Image
 import os
 # from system.menu import device_menu
-from helpers.config import Config
+from helpers.config import config
 from helpers.pager_menu import device_menu
 
 from system.globals import *
@@ -114,7 +114,7 @@ def display_alert(draw):
 
 
 def display_wifi(draw):
-    if Config.get_wifi():
+    if config.get_wifi():
         status = device_state.networking.get_wifi_status()
     else:
         status = DISABLED
@@ -128,7 +128,7 @@ def display_wifi(draw):
 
 
 def display_cellular(draw):
-    if Config.get_cellular():
+    if config.get_cellular():
         status = device_state.networking.get_cellular_status()
     else:
         status = DISABLED

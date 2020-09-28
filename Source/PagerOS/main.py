@@ -1,7 +1,7 @@
 import threading
 
 from system.globals import *
-from helpers.config import Config
+from helpers.config import config
 from helpers.kojin_logging import Log
 from helpers.pager_menu import device_menu
 import workers.display as display
@@ -22,16 +22,16 @@ def main():
     display.set_display_text("Initialising...")
     device_state.set_state(STATE_INITIALISING)
 
-    if Config.get_debug():
+    if config.get_debug():
         Log.debug(TAG, "Debugging enabled.")
-        Log.debugging = Config.get_debug()
+        Log.debugging = config.get_debug()
 
-    if not Config.graceful_exit():
+    if not config.graceful_exit():
         Log.warn(TAG, "Pager did not exit gracefully!")
         # TODO handle uploading logs to ftp server
 
-    Config.graceful_exit(False)
-    Config.save_state()
+    config.graceful_exit(False)
+    config.save_state()
 
     # device_state.networking.set_cellular_status(DISABLED)
 
@@ -203,7 +203,7 @@ def handle_update_alert_status(status):
 
 def handle_shut_down():
     """ Shuts down the pager gracefully """
-    Config.graceful_exit(True)
+    config.graceful_exit(True)
     os.system('sudo shutdown now')
 
 

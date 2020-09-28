@@ -3,7 +3,7 @@ import time
 from helpers.kojin_requests import *
 from helpers.kojin_logging import Log
 from system.globals import *
-from helpers.config import Config
+from helpers.config import config
 from system import events
 
 
@@ -15,7 +15,7 @@ on_update_connection_status = events.Event()
 
 
 def start():
-    Log.info(TAG, f"Starting networking as {Config.get_access_token()}")
+    Log.info(TAG, f"Starting networking as {config.get_access_token()}")
 
     while True:
         if device_state.get_state() == STATE_RESPONDING or device_state.get_state() == STATE_ACTIVE_ALERT:
@@ -37,7 +37,7 @@ def raise_alert(alert):
 def search_for_alert():
     Log.debug(TAG, "Searching for alert.")
     params = {
-        URL_PARAM_ACCESS_TOKEN: Config.get_access_token()
+        URL_PARAM_ACCESS_TOKEN: config.get_access_token()
     }
 
     api_status = True
@@ -59,7 +59,7 @@ def search_for_alert():
 
 def update_alert_status(alert_id, status):
     params = {
-        URL_PARAM_ACCESS_TOKEN: Config.get_access_token(),
+        URL_PARAM_ACCESS_TOKEN: config.get_access_token(),
         URL_PARAM_ALERT_ID: alert_id,
         URL_PARAM_STATUS: status
     }
@@ -71,7 +71,7 @@ def update_alert_status(alert_id, status):
 
 def on_update_location(location: Location):
     params = {
-        URL_PARAM_ACCESS_TOKEN: Config.get_access_token(),
+        URL_PARAM_ACCESS_TOKEN: config.get_access_token(),
         URL_PARAM_ALERT_ID: location.gps,
         URL_PARAM_STATUS: location.wifi
     }
