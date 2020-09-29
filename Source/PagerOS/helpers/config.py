@@ -1,10 +1,14 @@
 import configparser
 import os
 from system.constants import *
-import system.globals as glob
+import system.methods as glob
 
 
 class Config:
+    """ class to handle interfacing with config.ini
+
+     Changes to keys are stored in memory until Config.save_state is called.
+    """
     def __init__(self):
         self._config_parser = configparser.ConfigParser()
         self._config_parser.read(os.getcwd() + "/" + CONFIG_FILE)
@@ -56,6 +60,17 @@ class Config:
     def set_bluetooth(self, value):
         self._config_parser.set(INI_HEADER_DEVICE, INI_KEY_BLUETOOTH, str(value))
 
+    def get_sound(self):
+        return glob.parse_bool(self._config_parser[INI_HEADER_DEVICE][INI_KEY_SOUND])
+
+    def set_sound(self, value):
+        self._config_parser.set(INI_HEADER_DEVICE, INI_KEY_SOUND, str(value))
+
+    def get_vibrate(self):
+        return glob.parse_bool(self._config_parser[INI_HEADER_DEVICE][INI_KEY_VIBRATE])
+
+    def set_vibrate(self, value):
+        self._config_parser.set(INI_HEADER_DEVICE, INI_KEY_VIBRATE, str(value))
 
 
 config = Config()

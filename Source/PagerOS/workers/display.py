@@ -8,10 +8,15 @@ import os
 # from system.menu import device_menu
 from helpers.config import config
 from helpers.pager_menu import device_menu
+from system.constants import *
+from system.state import device_state
 
-from system.globals import *
+from system.methods import *
 
 TAG = "Display"
+
+COLOUR_WHITE = 255
+COLOUR_BLACK = 0
 
 refreshing = False
 
@@ -28,21 +33,21 @@ font = ImageFont.truetype(DIR_FONTS + "century.ttf", 25)
 small_font = ImageFont.truetype(DIR_FONTS + "century.ttf", 20)
 
 
-def handle_action(name):
-    print("Got action type", name)
-
-
 def exit_menu():
-    global _display_text_value
-    _display_text_value = STRING_EMPTY
+    """ Resets device state on exiting menu state """
+    set_refreshing(False)
+    clear_display_text()
     device_state.set_state(STATE_IDLE)
 
 
 device_menu.on_menu_exit.append(exit_menu)
-device_menu.on_action.append(handle_action)
 
 
 def start():
+    """ Starts continuous drawing/refresh of screen
+
+    This has to be continuous refresh as when a new draw object is created the screen is wiped.
+    """
     while True:
         with canvas(device) as draw:
             if device_state.get_state() == STATE_ACTIVE_ALERT:
@@ -59,6 +64,11 @@ def start():
 
 
 def display_menu(draw):
+    """ Gets current menu item name and sets the display text as that.
+
+    Args:
+         draw (PIL.ImageDraw.ImageDraw): display canvas object
+     """
     current_menu_text = device_menu.get_current_menu().subitems[device_menu.current_item_index].name
     if current_menu_text != _display_text_value:
         set_display_text(current_menu_text)
@@ -66,30 +76,36 @@ def display_menu(draw):
     set_refreshing(False)
 
 
-def make_font(name, size):
-    font_path = os.path.abspath(os.path.join(
-        os.path.dirname(__file__), name))
-    print(font_path)
-    return
-
-
 def set_display_text(text):
+    """ Sets script variable _display_text_value and resets the scroll value
+
+    Args:
+        text (str): new display text value
+
+    """
     global _display_text_value, text_pos
     _display_text_value = text
     text_pos = 0
 
 
 def clear_display_text():
+    """ resets script variable _display_text_value and the scroll value """
     global _display_text_value, text_pos
     _display_text_value = ""
     text_pos = 0
 
 
 def display_time(draw):
+    """ Draws current time in 24hr format top right of screen
+
+    Args:
+         draw (PIL.ImageDraw.ImageDraw): display canvas object
+     """
     draw.text((80, 0), datetime.now().strftime("%H:%M"), font=small_font, fill="white")
 
 
 def display_text(draw):
+    """ Draws and scrolls text in bottom half of screen """
     global text_pos
     w, h = draw.textsize(text=_display_text_value, font=font)
     if w > device.width:
@@ -103,6 +119,13 @@ def display_text(draw):
 
 
 def display_alert(draw):
+    """ Either displays black text on a white background or white text on the whole screen.
+
+    No status indicators are shown.
+
+    Args:
+         draw (PIL.ImageDraw.ImageDraw): display canvas object
+    """
     global flip
     if flip < 1:
         draw.rectangle((0, 0, 124, 64), fill="white")
@@ -114,6 +137,11 @@ def display_alert(draw):
 
 
 def display_wifi(draw):
+    """ Displays wifi strength symbol on top bar
+
+    Args:
+         draw (PIL.ImageDraw.ImageDraw): display canvas object
+    """
     if config.get_wifi():
         status = device_state.networking.get_wifi_status()
     else:
@@ -128,6 +156,11 @@ def display_wifi(draw):
 
 
 def display_cellular(draw):
+    """ Displays cellular strength symbol on top bar
+
+    Args:
+         draw (PIL.ImageDraw.ImageDraw): display canvas object
+    """
     if config.get_cellular():
         status = device_state.networking.get_cellular_status()
     else:
@@ -136,6 +169,14 @@ def display_cellular(draw):
 
 
 def draw_image(draw, path, x, y):
+    """ Generic method to display an image on the screen
+
+     Args:
+         draw (PIL.ImageDraw.ImageDraw): display canvas object
+         path (str): absolute path to image
+         x (int): x coord
+         y (int): y coord
+     """
     image = Image.open(path).convert("1")
 
     assert image.width + x <= device.width
@@ -144,15 +185,17 @@ def draw_image(draw, path, x, y):
     pixel_map = image.load()
     for i in range(0, image.width):
         for j in range(0, image.height):
-            if pixel_map[i, j] == 255:
+            if pixel_map[i, j] == COLOUR_WHITE:
                 draw.point((i + x, j + y), "white")
 
 
 def is_refresh():
+    """ returns refreshing variable """
     return refreshing
 
 
 def set_refreshing(value):
+    """ sets refreshing variable """
     global refreshing
     refreshing = value
 

@@ -1,4 +1,5 @@
-from system.globals import *
+from system.classes import Event, MenuItem, Menu
+from system.constants import *
 from helpers.kojin_logging import Log
 from helpers.config import config
 
@@ -12,12 +13,14 @@ on_reset_wifi = Event()
 
 
 def view_wifi():
+    """ Finds current wifi information and adjusts the subitem's name below to be the info before selecting it """
     view_wifi_item = device_menu.get_current_menu().subitems[device_menu.current_item_index]
     view_wifi_item.subitems[0].name = "WIFI STATUS GOES BRRRR"
     device_menu.current_item.append(view_wifi_item)
 
 
 def toggle_wifi():
+    """ Switches on or off wifi in config and saves config state"""
     config.set_wifi(not config.get_wifi())
     config.save_state()
 
@@ -31,22 +34,32 @@ def reset_wifi():
 
 
 def view_cellular():
+    """ Finds current cellular information and adjusts the subitem's name below to be the info before selecting it """
     view_cellular_item = device_menu.get_current_menu().subitems[device_menu.current_item_index]
     view_cellular_item.subitems[0].name = "CELLULAR STATUS GOES BRRRR"
     device_menu.current_item.append(view_cellular_item)
 
 
 def toggle_cellular():
+    """ Switches on or off cellular in config and saves config state"""
     config.set_cellular(not config.get_cellular())
     config.save_state()
 
 
 def action_empty():
+    """ Empty action for information only menu items """
     Log.debug(TAG, "Empty action triggered")
 
 
 def action_unimplemented():
-    Log.error(TAG, "Action not implemented!")
+    """ Logs and throws error if unimplemented action triggered"""
+    menu_stack = STRING_EMPTY
+    for item in device_menu.current_item:
+        menu_stack += f"    {item}\n"
+    Log.error(TAG, f"Action not implemented!\n  Menu stack:\n{menu_stack}\n\n  Current item:\n    "
+                   f"{device_menu.get_current_item()}")
+
+    raise NotImplemented("Menu action not implemented!")
 
 
 items = [

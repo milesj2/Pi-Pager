@@ -1,23 +1,27 @@
 import threading
-
-from system.globals import *
-from helpers.config import config
-from helpers.kojin_logging import Log
-from helpers.pager_menu import device_menu
-import workers.display as display
 import time
 import os
 
-from workers import gpio, networking, network_manager, location
+from system.state import device_state
+from system.classes import ALERT_EMPTY
+from system.constants import *
+from helpers.config import config
+from helpers.kojin_logging import Log
+from helpers.pager_menu import device_menu
+from workers import gpio, networking, network_manager, location, display
 
-# Constants
 TAG = "main"
-
 
 current_alert = ALERT_EMPTY
 
 
 def main():
+    """ Main method for pager.
+
+    This handles all threads, assigning events and
+    monitors threads to make sure they haven't crashed
+
+    """
     Log.info(TAG, "Pager Starting.")
     display.set_display_text("Initialising...")
     device_state.set_state(STATE_INITIALISING)
@@ -33,17 +37,9 @@ def main():
     config.graceful_exit(False)
     config.save_state()
 
-    # device_state.networking.set_cellular_status(DISABLED)
-
-    # setup networking, GPIO and bluetooth handlers
-    t_net = threading.Thread(target=networking.start)
-    t_location = threading.Thread(target=location.start)
-    t_gpio = threading.Thread(target=gpio.start)
-    t_net_manager = threading.Thread(target=network_manager.start)
-    t_display = threading.Thread(target=display.start)
-    # t_bluetooth = threading.Thread(target=bluetooth.start)
-
-    # add handler for receiving alert from server
+    #################################################
+    # ############## handlers  ######################
+    #################################################
     networking.on_received_alert.append(handle_alert)
     networking.on_update_connection_status(device_state.networking.set_api_status)
 
@@ -56,6 +52,18 @@ def main():
     gpio.on_negative_button_press.append(handle_negative_button_press)
     gpio.on_left_button_press.append(handle_left_button_press)
     gpio.on_right_button_press.append(handle_right_button_press)
+
+    #################################################
+    # ############### threads  ######################
+    #################################################
+
+    # setup networking, GPIO and bluetooth handlers
+    t_net = threading.Thread(target=networking.start)
+    t_location = threading.Thread(target=location.start)
+    t_gpio = threading.Thread(target=gpio.start)
+    t_net_manager = threading.Thread(target=network_manager.start)
+    t_display = threading.Thread(target=display.start)
+    # t_bluetooth = threading.Thread(target=bluetooth.start)
 
     t_net.start()
     t_gpio.start()
@@ -90,6 +98,7 @@ def main():
 
 
 def set_display_refreshing_if_false():
+    """ This is a disgusting method which I will change."""
     # fixme: what is this? This is an awful name
     if display.refreshing:
         return True
@@ -102,11 +111,6 @@ def set_display_refreshing_if_false():
 # ########## EVENTS ####################
 ########################################
 
-
-def handle_menu_action(menu_item):
-    pass
-
-
 def handle_connection_status_update(status):
     """ Gets a status update and updates display
 
@@ -117,6 +121,7 @@ def handle_connection_status_update(status):
 
 
 def handle_main_button_press():
+    """ Receives event from GPIO and performs actions based on device state """
     if device_state.get_state() == STATE_ACTIVE_ALERT:
         display.clear_display_text()
         handle_update_alert_status(ALERT_STATUS_ACKNOWLEDGE)
@@ -133,6 +138,7 @@ def handle_main_button_press():
 
 
 def handle_negative_button_press():
+    """ Receives event from GPIO and performs actions based on device state """
     if device_state.get_state() == STATE_ACTIVE_ALERT:
         handle_update_alert_status(ALERT_STATUS_DISMISSED)
     elif device_state.get_state() == STATE_MENU:
@@ -147,6 +153,7 @@ def handle_negative_button_press():
 
 
 def handle_left_button_press():
+    """ Receives event from GPIO and performs actions based on device state """
     if device_state.get_state() == STATE_MENU:
         if set_display_refreshing_if_false():
             return
@@ -154,6 +161,7 @@ def handle_left_button_press():
 
 
 def handle_right_button_press():
+    """ Receives event from GPIO and performs actions based on device state """
     if device_state.get_state() == STATE_MENU:
         if set_display_refreshing_if_false():
             return
@@ -204,6 +212,7 @@ def handle_update_alert_status(status):
 def handle_shut_down():
     """ Shuts down the pager gracefully """
     config.graceful_exit(True)
+    config.save_state()
     os.system('sudo shutdown now')
 
 

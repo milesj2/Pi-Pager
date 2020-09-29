@@ -1,7 +1,7 @@
 import time
 from system.classes import Location, LongLat
 from system.constants import *
-from system.globals import device_state
+from system.state import device_state
 from system.events import Event
 from helpers.kojin_logging import Log
 from helpers.config import config
@@ -17,14 +17,17 @@ def start():
     while True:
         Log.info(TAG, "Handling location stuff.")
         wifi = LongLat("", "")
-        # if device_state.networking.get_wifi_status() != DISABLED:
         if config.get_wifi():
             wifi = get_wifi_location()
         gps = get_gps_location()
         loc = Location(gps, wifi)
         on_update_location(loc)
         if device_state.get_state() != STATE_ACTIVE_ALERT:
-            time.sleep(300)
+            # Sleep for 5 minutes, or until there is a an alert.
+            for i in range(0, 60):
+                if device_state.get_state() == STATE_ACTIVE_ALERT:
+                    break
+                time.sleep(5)
         else:
             time.sleep(5)
 

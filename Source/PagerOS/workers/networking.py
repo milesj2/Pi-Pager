@@ -2,7 +2,9 @@ import time
 
 from helpers.kojin_requests import *
 from helpers.kojin_logging import Log
-from system.globals import *
+from system.constants import *
+from system.state import device_state
+from system.classes import ALERT_EMPTY, Alert, Location
 from helpers.config import config
 from system import events
 
@@ -34,6 +36,10 @@ def raise_alert(alert):
     on_received_alert(alert)
 
 
+def deserialise_reponse(dict):
+    return Alert(dict['id'], dict['shoutID'], dict['pagerID'], dict['stationID'], dict['type'])
+
+
 def search_for_alert():
     Log.debug(TAG, "Searching for alert.")
     params = {
@@ -52,7 +58,7 @@ def search_for_alert():
         alert = ALERT_EMPTY
     else:
         # TODO check for multiple shouts and deal with that... If thats a use case
-        alert = deserialize_alert(response.message[0])
+        alert = deserialise_reponse(response.message[0])
     on_update_connection_status(api_status)
     return alert
 

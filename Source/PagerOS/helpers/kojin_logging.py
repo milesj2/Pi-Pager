@@ -12,8 +12,7 @@ SEPARATOR = " | "
 
 
 class Log:
-    _TAB = 2
-    _current_indentation = 0
+    """ Static class to handle logging """
 
     debugging = False
 
@@ -48,19 +47,9 @@ class Log:
 
     @staticmethod
     def make_decorators():
-        return Log.get_current_datetime() + SEPARATOR + Log.get_decorators()
+        return Log.get_current_datetime() + SEPARATOR
 
     @staticmethod
     def get_current_datetime():
         now = datetime.now()
         return now.strftime("%Y-%m-%d %H:%M:%S:%f")
-
-    @staticmethod
-    def get_decorators():
-        if Log._current_indentation == 0:
-            return ""
-        decorator = ""
-        for i in range(0, Log._current_indentation - 1):
-            decorator += SEPARATOR
-        decorator += " |-"
-        return decorator

@@ -1,13 +1,14 @@
 import time
-import datetime
+from datetime import datetime
 import RPi.GPIO as GPIO
-from system.globals import *
+from system.constants import *
+from system.events import Event
+from system.state import device_state
 from helpers.config import config
 from helpers.kojin_logging import Log
-from system.events import Event
-
 
 TAG = "gpio.thread"
+
 PIN_NEGATIVE_BUTTON = 17
 PIN_BUZZER = 18
 PIN_LED_ALERT = 23
@@ -18,7 +19,8 @@ PIN_RIGHT_BUTTON = 22
 
 FREQUENCY_HIGH = 0.0011
 FREQUENCY_LOW = 0.001
-NOTE_LENGTH = 200
+NOTE_FULL_LENGTH = 200
+NOTE_HALF_LENGTH = 100
 
 
 on_shutdown_signal_received = Event()
@@ -75,6 +77,9 @@ def handle_button_press(channel):
 
 
 def play_note(length, frequency):
+    if not config.get_sound():
+        time.sleep(length * frequency * 2)
+        return
     for i in range(0, length):
         GPIO.output(PIN_BUZZER, GPIO.HIGH)
         time.sleep(frequency)
@@ -92,43 +97,40 @@ def handle_alert(shout_type):
 
 def handle_shout():
     """ All io for alerting user there is a shout is handled here """
-    global acknowledged
-    acknowledged = False
     Log.info(TAG, "Setting off alert for a shout!")
-    time_started = datetime.time
+    time_started = datetime.now()
     for i in range(0, ALERTER_TIMEOUT):
         if acknowledged:
-            time_finished = datetime.time
-            Log.info(TAG, f"Alert acknowledged. Stopping alerter after {i} seconds.")
+            time_taken = datetime.now() - time_started
+            Log.info(TAG, f"Alert acknowledged. Stopping alerter after {time_taken.seconds} seconds.")
             break
-        play_note(NOTE_LENGTH, FREQUENCY_LOW)
+        play_note(NOTE_FULL_LENGTH, FREQUENCY_LOW)
         GPIO.output(PIN_LED_ALERT, GPIO.HIGH)
-        play_note(NOTE_LENGTH, FREQUENCY_HIGH)
+        play_note(NOTE_FULL_LENGTH, FREQUENCY_HIGH)
         GPIO.output(PIN_LED_ALERT, GPIO.LOW)
-    if not acknowledged:
+    time_taken = datetime.now() - time_started
+    if time_taken.seconds > ALERTER_TIMEOUT:
         Log.info(TAG, "Alert timed out.")
         on_update_alert_status(ALERT_STATUS_TIMED_OUT)
 
 
 def handle_test():
     """ All io for alerting user there is a test alert is handled here """
-    global acknowledged
-    acknowledged = False
     Log.info(TAG, "Setting off alert for a test!")
-
+    time_started = datetime.now()
     for i in range(0, ALERTER_TIMEOUT):
         if device_state.get_state() != STATE_ACTIVE_ALERT:
-            Log.info(TAG, f"Alert acknowledged. Stopping alerter after {i} seconds.")
+            time_taken = datetime.now() - time_started
+            Log.info(TAG, f"Alert acknowledged. Stopping alerter after {time_taken.seconds} seconds.")
             break
-        play_note(100, FREQUENCY_HIGH)
+        play_note(NOTE_HALF_LENGTH, FREQUENCY_HIGH)
         GPIO.output(PIN_LED_ALERT, GPIO.HIGH)
         time.sleep(0.1)
-        play_note(100, FREQUENCY_HIGH)
+        play_note(NOTE_HALF_LENGTH, FREQUENCY_HIGH)
         GPIO.output(PIN_LED_ALERT, GPIO.LOW)
         time.sleep(0.1)
-    # if not acknowledged:
-    # If it has not been acknowledged and still in active alert state
-    if device_state.get_state() == STATE_ACTIVE_ALERT:
+    time_taken = datetime.now() - time_started
+    if time_taken.seconds > ALERTER_TIMEOUT:
         Log.info(TAG, "Alert timed out.")
         on_update_alert_status(ALERT_STATUS_TIMED_OUT)
 

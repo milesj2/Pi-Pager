@@ -25,6 +25,8 @@ INI_KEY_DEBUG = "debug"
 INI_KEY_WIFI = "wifi"
 INI_KEY_BLUETOOTH = "bluetooth"
 INI_KEY_CELLULAR = "cellular"
+INI_KEY_SOUND = "sound"
+INI_KEY_VIBRATE = "vibrate"
 
 URL_PARAM_ACCESS_TOKEN = "accessToken"
 URL_PARAM_ALERT_ID = "alertID"

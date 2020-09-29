@@ -3,7 +3,7 @@ from system.events import Event
 
 
 class Alert(object):
-    """ Class object to be populated by json response"""
+    """ alert object to be populated by json response """
     def __init__(self, alert_id, shout_id, pager_id, station_id, alert_type):
         self.id = alert_id
         self.shout_id = shout_id
@@ -12,32 +12,38 @@ class Alert(object):
         self.type = alert_type
 
 
+ALERT_EMPTY = Alert("", "", "", "", "")
+
+
 class LongLat:
+    """ Longitude and latitude object """
     def __init__(self, long, lat):
         self.long = long
         self.lat = lat
 
 
 class Location:
+    """ An object to contain gps and wifi long lat to send to api """
     def __init__(self, gps_loc: LongLat, wifi_loc: LongLat):
         self.gps = gps_loc
         self.wifi = wifi_loc
 
 
 class MenuItem:
+    """ Item can either be an action or submenu, use this to build a full menu within Menu.items """
     name = consts.STRING_EMPTY
     subitems = []
     type = consts.STRING_EMPTY
     action = consts.STRING_EMPTY
 
-    def __init__(self, name, itemType, action=None, args=None, subitems=None):
+    def __init__(self, name, item_type, action=None, args=None, subitems=None):
         if subitems is None:
             subitems = []
         if args is None:
             args = []
         self.name = name
         self.subitems = subitems
-        self.type = itemType
+        self.type = item_type
         self.action = action
         self.args = args
 
@@ -53,8 +59,6 @@ class MenuItem:
 
 
 class Menu:
-    on_action = Event()
-    _on_action = Event()
     on_menu_exit = Event()
     current_item = []
 
@@ -69,12 +73,8 @@ class Menu:
     items = []
 
     def __init__(self, items):
-        self._on_action.append(self.fire_action_event)
         self.items = items
         self.current_item.append(self.items[0])
-
-    def fire_action_event(self):
-        self.on_action(self.get_current_item())
 
     def get_current_menu(self):
         return self.current_item[len(self.current_item) - 1]
@@ -118,4 +118,4 @@ class Menu:
         self.current_item_index = 0
 
 
-ALERT_EMPTY = Alert("", "", "", "", "")
+
