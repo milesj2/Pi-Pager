@@ -50,6 +50,10 @@ def start():
     """
     while True:
         with canvas(device) as draw:
+            if device_state.get_state() == STATE_SHUTTING_DOWN:
+                display_text(draw)
+                time.sleep(0.2)
+                continue
             if device_state.get_state() == STATE_ACTIVE_ALERT:
                 display_alert(draw)
                 continue
@@ -59,7 +63,7 @@ def start():
             if device_state.get_state() == STATE_MENU:
                 display_menu(draw)
             else:
-                display_time(draw)
+                display_text(draw)
             time.sleep(0.2)
 
 
@@ -93,6 +97,11 @@ def clear_display_text():
     global _display_text_value, text_pos
     _display_text_value = ""
     text_pos = 0
+
+
+def clear_display():
+    with canvas(device) as draw:
+        draw.rectangle((0, 0, 124, 64), fill="black")
 
 
 def display_time(draw):

@@ -52,10 +52,10 @@ def start():
     GPIO.output(PIN_LED_POWER, GPIO.HIGH)
 
     # Add main button listener
-    GPIO.add_event_detect(PIN_MAIN_BUTTON, GPIO.RISING, callback=handle_button_press)
-    GPIO.add_event_detect(PIN_NEGATIVE_BUTTON, GPIO.RISING, callback=handle_button_press)
-    GPIO.add_event_detect(PIN_LEFT_BUTTON, GPIO.RISING, callback=handle_button_press)
-    GPIO.add_event_detect(PIN_RIGHT_BUTTON, GPIO.RISING, callback=handle_button_press)
+    GPIO.add_event_detect(PIN_MAIN_BUTTON, GPIO.FALLING, callback=handle_button_press, bouncetime=500)
+    GPIO.add_event_detect(PIN_NEGATIVE_BUTTON, GPIO.FALLING, callback=handle_button_press)
+    GPIO.add_event_detect(PIN_LEFT_BUTTON, GPIO.FALLING, callback=handle_button_press)
+    GPIO.add_event_detect(PIN_RIGHT_BUTTON, GPIO.FALLING, callback=handle_button_press)
 
     Log.info(TAG, "Listening to inputs!")
     while True:
@@ -65,10 +65,19 @@ def start():
 def handle_button_press(channel):
     """ Event handler for when any button is pressed"""
     Log.debug(TAG, "Button pressed - " + str(channel))
+    start_time = time.time()
+    while GPIO.input(channel) == 0:  # Wait for the button up
+        pass
+    button_time = time.time() - start_time
+    Log.debug(TAG, f"Button released - {channel} after {button_time}")
     if channel == PIN_MAIN_BUTTON:
         on_main_button_press()
     elif channel == PIN_NEGATIVE_BUTTON:
-        on_negative_button_press()
+        if button_time > 3:
+            print("shutting down")
+            on_shutdown_signal_received()
+        else:
+            on_negative_button_press()
     elif channel == PIN_LEFT_BUTTON:
         on_left_button_press()
     else:

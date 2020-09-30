@@ -211,8 +211,12 @@ def handle_update_alert_status(status):
 
 def handle_shut_down():
     """ Shuts down the pager gracefully """
+    display.set_display_text("Shutting down.")
+    device_state.set_state(STATE_SHUTTING_DOWN)
     config.graceful_exit(True)
     config.save_state()
+    time.sleep(3)
+    display.clear_display_text()
     os.system('sudo shutdown now')
 
 
