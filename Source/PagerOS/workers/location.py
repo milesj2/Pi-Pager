@@ -1,4 +1,5 @@
 import time
+import serial
 from system.classes import Location, LongLat
 from system.constants import *
 from system.state import device_state
@@ -9,6 +10,11 @@ import helpers.location_requests as k_requests
 
 
 TAG = "location.thread"
+
+ser = serial.Serial("/dev/ttyAMA0")
+gpgga_info = "$GPGGA"
+GPGGA_buffer = 0
+NMEA_buff = 0
 
 on_update_location = Event()
 
@@ -52,12 +58,46 @@ def get_wifi_location():
     if wifi_loc.status == "ok":
         return LongLat(wifi_loc.lon, wifi_loc.lat)
     else:
-        return LongLat("", "")
+        return LongLat(-1, -1)
 
 
 def get_gps_location():
-    # interace with gpio
-    return LongLat("", "")
+    """
+    https://www.engineersgarage.com/microcontroller-projects/articles-raspberry-pi-neo-6m-gps-module-interfacing/
+    """
+    gps_loc = LongLat(-1, -1)
+    Log.info(TAG, f"Waiting for GPS data input.")
+    while True:
+        received_data = ser.readline().decode().split(",")
+        if received_data[0] == gpgga_info:
+            break
+    Log.info(TAG, f"Processing GPS data.")
+    nmea_buff = received_data[1:]
+    nmea_latitude = nmea_buff[1]
+    nmea_latitude_direction = nmea_buff[2]
+    nmea_longitude = nmea_buff[3]
+    nmea_longitude_direction = nmea_buff[4]
+    if nmea_latitude != STRING_EMPTY or nmea_longitude != STRING_EMPTY:
+        gps_loc.lat = convert_to_degrees(nmea_latitude, nmea_latitude_direction)
+        gps_loc.long = convert_to_degrees(nmea_longitude, nmea_longitude_direction)
+        Log.info(TAG, f"NMEA Latitude: {gps_loc.lat} | NMEA Longitude: {gps_loc.long}")
+    return gps_loc
+
+
+def convert_to_degrees(raw_value, direction):
+    """
+    https://www.engineersgarage.com/microcontroller-projects/articles-raspberry-pi-neo-6m-gps-module-interfacing/
+    """
+    raw_value = float(raw_value)
+    if direction == "S" or direction == "W":
+        raw_value = - raw_value
+    decimal_value = raw_value / 100.00
+    degrees = int(decimal_value)
+    mm_mmmm = (decimal_value - int(decimal_value)) / 0.6
+    position = degrees + mm_mmmm
+    return "%.8f" % position
+
+
 
 
 if __name__ == '__main__':
