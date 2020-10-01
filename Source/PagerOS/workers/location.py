@@ -20,9 +20,10 @@ on_update_location = Event()
 
 
 def start():
+    """ Handles periodic location updates. """
     while True:
-        Log.info(TAG, "Handling location stuff.")
-        wifi = LongLat("", "")
+        Log.info(TAG, "Searching for location.")
+        wifi = LongLat(-1, -1)
         if config.get_wifi():
             wifi = get_wifi_location()
         gps = get_gps_location()
@@ -39,8 +40,15 @@ def start():
 
 
 def get_wifi_location():
+    """ Sends nearby BSSIDs to location api and returns approx location
+
+    returns:
+        (LongLat): (-1, -1) if request error, or real data.
+    """
     # TODO get wifi stats
     bssids = ["ac:3b:77:ee:1e:b6", "78:44:76:d3:42:30"]
+
+    Log.info(TAG, "Finding location via WIFI.")
 
     params = {
         "token": LOCATION_API_KEY,
@@ -62,8 +70,14 @@ def get_wifi_location():
 
 
 def get_gps_location():
-    """
+    """ Parses serial output of neo-6m GPS module and extract long/lat from data buffer
+
+    Modified code from source:
     https://www.engineersgarage.com/microcontroller-projects/articles-raspberry-pi-neo-6m-gps-module-interfacing/
+
+    returns:
+        gps_loc (LongLat): (-1, -1) if no GPS signal, or real data.
+
     """
     gps_loc = LongLat(-1, -1)
     Log.info(TAG, f"Waiting for GPS data input.")
@@ -85,8 +99,16 @@ def get_gps_location():
 
 
 def convert_to_degrees(raw_value, direction):
-    """
+    """ Takes raw data and compass direction and converts it to degrees
+
+    Modified from:
     https://www.engineersgarage.com/microcontroller-projects/articles-raspberry-pi-neo-6m-gps-module-interfacing/
+
+    args:
+        raw_value (str): Latitude or longitude position
+        direction (char): First letter of compass direction (N, S, E, W)
+    return:
+        position (float): degrees
     """
     raw_value = float(raw_value)
     if direction == "S" or direction == "W":

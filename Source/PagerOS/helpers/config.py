@@ -18,11 +18,11 @@ class Config:
             self._config_parser.write(file)
             file.close()
 
-    def graceful_exit(self, value=STRING_EMPTY):
-        if value == STRING_EMPTY:
-            return glob.parse_bool(self._config_parser[INI_HEADER_PAGER][INI_KEY_GRACEFUL_EXIT])
-        else:
-            self._config_parser.set(INI_HEADER_PAGER, INI_KEY_GRACEFUL_EXIT, str(value))
+    def get_graceful_exit(self):
+        return glob.parse_bool(self._config_parser[INI_HEADER_PAGER][INI_KEY_GRACEFUL_EXIT])
+
+    def set_graceful_exit(self, value):
+        self._config_parser.set(INI_HEADER_PAGER, INI_KEY_GRACEFUL_EXIT, str(value))
 
     def get_user_name(self):
         return self._config_parser[INI_HEADER_USER][INI_KEY_NAME]

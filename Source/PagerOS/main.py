@@ -18,8 +18,7 @@ current_alert = ALERT_EMPTY
 def main():
     """ Main method for pager.
 
-    This handles all threads, assigning events and
-    monitors threads to make sure they haven't crashed
+    This handles all threads, assigning events and monitors threads to make sure they haven't crashed.
 
     """
     Log.info(TAG, "Pager Starting.")
@@ -30,11 +29,11 @@ def main():
         Log.debug(TAG, "Debugging enabled.")
         Log.debugging = config.get_debug()
 
-    if not config.graceful_exit():
+    if not config.get_graceful_exit():
         Log.warn(TAG, "Pager did not exit gracefully!")
         # TODO handle uploading logs to ftp server
 
-    config.graceful_exit(False)
+    config.set_graceful_exit(False)
     config.save_state()
 
     #################################################
@@ -97,16 +96,6 @@ def main():
         time.sleep(10)
 
 
-def set_display_refreshing_if_false():
-    """ This is a disgusting method which I will change."""
-    # fixme: what is this? This is an awful name
-    if display.refreshing:
-        return True
-    else:
-        display.refreshing = True
-        return False
-
-
 ########################################
 # ########## EVENTS ####################
 ########################################
@@ -126,12 +115,14 @@ def handle_main_button_press():
         display.clear_display_text()
         handle_update_alert_status(ALERT_STATUS_ACKNOWLEDGE)
     elif device_state.get_state() == STATE_MENU:
-        if set_display_refreshing_if_false():
+        if display.refreshing:
             return
+        display.refreshing = True
         device_menu.select_item()
     else:
-        if set_display_refreshing_if_false():
+        if display.refreshing:
             return
+        display.refreshing = True
         device_menu.reset()
         display.clear_display_text()
         device_state.set_state(STATE_MENU)
@@ -142,12 +133,14 @@ def handle_negative_button_press():
     if device_state.get_state() == STATE_ACTIVE_ALERT:
         handle_update_alert_status(ALERT_STATUS_DISMISSED)
     elif device_state.get_state() == STATE_MENU:
-        if set_display_refreshing_if_false():
+        if display.refreshing:
             return
+        display.refreshing = True
         device_menu.deselect_item()
     else:
-        if set_display_refreshing_if_false():
+        if display.refreshing:
             return
+        display.refreshing = True
         device_menu.reset()
         display.clear_display_text()
 
@@ -155,16 +148,18 @@ def handle_negative_button_press():
 def handle_left_button_press():
     """ Receives event from GPIO and performs actions based on device state """
     if device_state.get_state() == STATE_MENU:
-        if set_display_refreshing_if_false():
+        if display.refreshing:
             return
+        display.refreshing = True
         device_menu.move_left()
 
 
 def handle_right_button_press():
     """ Receives event from GPIO and performs actions based on device state """
     if device_state.get_state() == STATE_MENU:
-        if set_display_refreshing_if_false():
+        if display.refreshing:
             return
+        display.refreshing = True
         device_menu.move_right()
 
 
@@ -213,7 +208,7 @@ def handle_shut_down():
     """ Shuts down the pager gracefully """
     display.set_display_text("Shutting down.")
     device_state.set_state(STATE_SHUTTING_DOWN)
-    config.graceful_exit(True)
+    config.set_graceful_exit(True)
     config.save_state()
     time.sleep(3)
     display.clear_display_text()
