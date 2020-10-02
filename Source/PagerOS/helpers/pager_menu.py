@@ -1,4 +1,4 @@
-from system.classes import Event, MenuItem, Menu
+from system.classes import Event, MenuItem, Menu, KnownWifiManager
 from system.constants import *
 from helpers.kojin_logging import Log
 from helpers.config import config
@@ -25,8 +25,40 @@ def toggle_wifi():
     config.save_state()
 
 
+def delete_wifi():
+    """ Deletes selected ssid from in memory list and overwrites wpa_supplicants.conf"""
+    known_networks = KnownWifiManager()
+    item = device_menu.current_item[len(device_menu.current_item) - 2]
+
+    for ssid in known_networks.ssids:
+        if item.name != ssid.ssid:
+            continue
+        known_networks.ssids.remove(ssid)
+    known_networks.save()
+
+    # Return to managing known networks
+    device_menu.current_item.pop()
+    device_menu.current_item.pop()
+    manage_wifi()
+
+
 def manage_wifi():
-    pass
+    """ Parses wpa_supplicants.conf to find stored SSIDs and passwords, then populates menu items for each one"""
+    known_networks = KnownWifiManager()
+
+    manage_wifi_item = device_menu.get_current_menu().subitems[device_menu.current_item_index]
+    manage_wifi_item.subitems.clear()
+
+    for known_network in known_networks.ssids:
+        manage_wifi_item.subitems.append(MenuItem(known_network.ssid, MENU_TYPE_MENU, subitems=[
+            MenuItem("Delete", MENU_TYPE_MENU, subitems=[
+                MenuItem(f"Are you sure? ({known_network.ssid})", MENU_TYPE_ACTION, action=delete_wifi)
+            ])
+        ]))
+
+    device_menu.current_item_index = 0
+    device_menu.current_item.append(manage_wifi_item)
+    del known_networks
 
 
 def reset_wifi():
@@ -43,6 +75,12 @@ def view_cellular():
 def toggle_cellular():
     """ Switches on or off cellular in config and saves config state"""
     config.set_cellular(not config.get_cellular())
+    config.save_state()
+
+
+def toggle_sound():
+    """ Switches on or off wifi in config and saves config state"""
+    config.set_sound(not config.get_sound())
     config.save_state()
 
 
@@ -70,7 +108,7 @@ items = [
                             MenuItem("STRING_EMPTY", MENU_TYPE_ACTION, action=action_empty)
                         ]),
                         MenuItem("Toggle Wifi", MENU_TYPE_ACTION, action=toggle_wifi),
-                        MenuItem("Manage Known Networks", "DIALOGUE", action=action_unimplemented),
+                        MenuItem("Manage Known Networks", MENU_TYPE_ACTION, action=manage_wifi, subitems=[]),
                         MenuItem("Reset Wifi", MENU_TYPE_ACTION, action=reset_wifi)
                     ]),
                     MenuItem("Cellular/Mobile", "MENU", subitems=[
@@ -82,7 +120,7 @@ items = [
                 ]),
                 MenuItem(MENU_SOUND_VIBRATE, "MENU", subitems=[
                     MenuItem("Sound", "MENU", subitems=[
-                        MenuItem("Toggle Sound", "ACTION", action=action_unimplemented),
+                        MenuItem("Toggle Sound", "ACTION", action=toggle_sound),
                     ]),
                     MenuItem("Vibrate", "MENU", subitems=[
                         MenuItem("Toggle Vibrate", "ACTION", action=action_unimplemented),

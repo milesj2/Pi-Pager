@@ -81,10 +81,14 @@ def get_gps_location():
     """
     gps_loc = LongLat(-1, -1)
     Log.info(TAG, f"Waiting for GPS data input.")
-    while True:
+    received_data = []
+    for i in range(0, 10):
         received_data = ser.readline().decode().split(",")
         if received_data[0] == gpgga_info:
             break
+        time.sleep(1)
+    if len(received_data) == 0:
+        return gps_loc
     Log.info(TAG, f"Processing GPS data.")
     nmea_buff = received_data[1:]
     nmea_latitude = nmea_buff[1]

@@ -1,5 +1,7 @@
 PAGER_VERSION = "v0.1_ALPHA"
 
+WPA_SUPPLICANT_FILE = "/etc/wpa_supplicant/wpa_supplicant.conf"
+
 DIR_RES = "/home/pi/pager/res/"
 DIR_FONTS = DIR_RES + "fonts/"
 DIR_ICO = DIR_RES + "ico/"
