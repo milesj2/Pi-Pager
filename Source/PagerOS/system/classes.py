@@ -149,23 +149,14 @@ class KnownWifiManager:
 
         self.ssids.clear()
 
-        match_idx = 0
-        len_contents = len(contents)
-        for i in range(0, len_contents):
-            char = contents[i]
-            if match_idx == self.LINE_NETWORK_LEN:
-                match_idx = 0
-                j = i
-                while j <= len_contents:
-                    if contents[j] == "}":
-                        break
-                    j += 1
-                network = contents[i:j]
-                self.ssids.append(KnownNetwork(self.parse_ssid(network), self.parse_psk(network)))
-            elif char == self.LINE_NETWORK[match_idx]:
-                match_idx += 1
-            else:
-                match_idx = 0
+        contents_left = contents
+        index = contents_left.find(self.LINE_NETWORK)
+        while index != -1:
+            end = contents_left.find(self.LAST_CHAR)
+            network_info = contents_left[index + 9: end]
+            self.ssids.append(KnownNetwork(self.parse_ssid(network_info), self.parse_psk(network_info)))
+            contents_left = contents_left[end + 1:]
+            index = contents_left.find(self.LINE_NETWORK)
 
     def parse_ssid(self, network: str):
         start = network.find("ssid=\"") + 6
