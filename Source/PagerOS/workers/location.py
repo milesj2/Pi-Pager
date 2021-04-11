@@ -6,7 +6,8 @@ from system.state import device_state
 from system.events import Event
 from helpers.kojin_logging import Log
 from helpers.config import config
-import helpers.location_requests as k_requests
+# import helpers.location_requests as k_requests
+from helpers.device_requests import Requests
 
 
 TAG = "location.thread"
@@ -45,7 +46,6 @@ def get_wifi_location():
     returns:
         (LongLat): (-1, -1) if request error, or real data.
     """
-    # TODO get wifi stats
     bssids = ["ac:3b:77:ee:1e:b6", "78:44:76:d3:42:30"]
 
     Log.info(TAG, "Finding location via WIFI.")
@@ -62,11 +62,13 @@ def get_wifi_location():
         }]
     }
 
-    wifi_loc = k_requests.http_post(URL_LOCATION_API + URL_ROUTE_LOCATION_API_LOCATION, params)
-    if wifi_loc.status == "ok":
-        return LongLat(wifi_loc.lon, wifi_loc.lat)
+    system_requests = Requests()
+    response = system_requests.http_post(URL_LOCATION_API + URL_ROUTE_LOCATION_API_LOCATION, params)
+    if response["Status"] == "ok":
+        location = system_requests.deserialise_response(response, Location)
+        return LongLat(location.lon, location.lat)
     else:
-        return LongLat(-1, -1)
+        LongLat(-1, -1)
 
 
 def get_gps_location():
@@ -124,6 +126,20 @@ def convert_to_degrees(raw_value, direction):
     return "%.8f" % position
 
 
+class LocationResponse:
+    """ Deserialized class formed from default response from API"""
+    status = STRING_EMPTY
+    balance = STRING_EMPTY
+    lat = STRING_EMPTY
+    lon = STRING_EMPTY
+    accuracy = STRING_EMPTY
+
+
+class ErrorResponse:
+    """ Deserialized class formed from default response from API"""
+    status = STRING_EMPTY
+    message = STRING_EMPTY
+    balance = STRING_EMPTY
 
 
 if __name__ == '__main__':

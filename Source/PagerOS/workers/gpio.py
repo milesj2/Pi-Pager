@@ -126,8 +126,8 @@ def alert_sound(note_length):
         note_length (int): length of each note
     """
     while device_state.get_state() == STATE_ACTIVE_ALERT:
-        play_note(note_length, FREQUENCY_HIGH)
-        play_note(note_length, FREQUENCY_LOW)
+        play_note(note_length, int(FREQUENCY_HIGH))
+        play_note(note_length, int(FREQUENCY_LOW))
 
 
 def alert_vibrate(vibrate_length, rest):

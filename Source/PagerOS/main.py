@@ -56,7 +56,6 @@ def main():
     # ############### threads  ######################
     #################################################
 
-    # setup networking, GPIO and bluetooth handlers
     t_net = threading.Thread(target=networking.start)
     t_location = threading.Thread(target=location.start)
     t_gpio = threading.Thread(target=gpio.start)
@@ -89,6 +88,10 @@ def main():
             Log.warn(TAG, "Network manager thread has died. Restarting...")
             t_net_manager = threading.Thread(target=network_manager.start)
             t_net_manager.start()
+        if not t_display.is_alive():
+            Log.warn(TAG, "Display thread has died. Restarting...")
+            t_display = threading.Thread(target=network_manager.start)
+            t_display.start()
         if not t_location.is_alive():
             Log.warn(TAG, "Location thread has died. Restarting...")
             t_net_manager = threading.Thread(target=location.start)

@@ -29,8 +29,8 @@ CHAR_LEN = 12
 serial = i2c(port=1, address=0x3C)
 device = ssd1306(serial, rotate=0)
 
-font = ImageFont.truetype(DIR_FONTS + "century.ttf", 25)
-small_font = ImageFont.truetype(DIR_FONTS + "century.ttf", 20)
+DEFAULT_FONT = ImageFont.truetype(DIR_FONTS + "century.ttf", 25)
+SMALL_FONT = ImageFont.truetype(DIR_FONTS + "century.ttf", 20)
 
 
 def exit_menu():
@@ -50,6 +50,7 @@ def start():
     """
     while True:
         with canvas(device) as draw:
+            # Handle full screen states
             if device_state.get_state() == STATE_SHUTTING_DOWN:
                 display_text(draw)
                 time.sleep(0.2)
@@ -57,9 +58,11 @@ def start():
             if device_state.get_state() == STATE_ACTIVE_ALERT:
                 display_alert(draw)
                 continue
+            # Draw system status icons
             display_wifi(draw)
             display_time(draw)
             display_cellular(draw)
+
             if device_state.get_state() == STATE_MENU:
                 display_menu(draw)
             else:
@@ -110,20 +113,20 @@ def display_time(draw):
     Args:
          draw (PIL.ImageDraw.ImageDraw): display canvas object
      """
-    draw.text((80, 0), datetime.now().strftime("%H:%M"), font=small_font, fill="white")
+    draw.text((80, 0), datetime.now().strftime("%H:%M"), font=SMALL_FONT, fill="white")
 
 
 def display_text(draw):
     """ Draws and scrolls text in bottom half of screen """
     global text_pos
-    w, h = draw.textsize(text=_display_text_value, font=font)
+    w, h = draw.textsize(text=_display_text_value, font=DEFAULT_FONT)
     if w > device.width:
         if text_pos < 0 - w:
             text_pos = device.width
-        draw.text((text_pos, 40), text=_display_text_value, font=font, fill="white")
+        draw.text((text_pos, 40), text=_display_text_value, font=DEFAULT_FONT, fill="white")
         text_pos -= 25
     else:
-        draw.text((0, 40), text=_display_text_value, font=font, fill="white")
+        draw.text((0, 40), text=_display_text_value, font=DEFAULT_FONT, fill="white")
     set_refreshing(False)
 
 
@@ -138,9 +141,9 @@ def display_alert(draw):
     global flip
     if flip < 1:
         draw.rectangle((0, 0, 124, 64), fill="white")
-        draw.text((16, 32), text=_display_text_value, font=font, fill="black")
+        draw.text((16, 32), text=_display_text_value, font=DEFAULT_FONT, fill="black")
     else:
-        draw.text((16, 32), text=_display_text_value, font=font, fill="white")
+        draw.text((16, 32), text=_display_text_value, font=DEFAULT_FONT, fill="white")
     flip *= -1
     time.sleep(0.2)
 

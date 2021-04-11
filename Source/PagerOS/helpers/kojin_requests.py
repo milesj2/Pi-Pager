@@ -1,4 +1,5 @@
-import requests
+import device_requests
+from system.state import device_state
 from system.constants import *
 from helpers.kojin_logging import Log
 
@@ -28,7 +29,7 @@ def deserialize_response(dct):
     return StdResponse(dct['status'], dct['message'])
 
 
-def http_get(url, params):
+def wifi_get(url, params):
     """ Sends get request to Kojin Pager Api and deserializes the standard response
 
     Args:
@@ -39,19 +40,30 @@ def http_get(url, params):
         response (StdResponse): deserialized json response
     """
     try:
-        response = requests.get(url, params)
+        response = device_requests.get(url, params)
         # TODO more error handling to do.
         if 'value' in response.json():
             response = deserialize_response(response.json()['value'])
         else:
             response = deserialize_response(response.json())
         return response
-    except requests.ConnectionError as e:
+    except device_requests.ConnectionError as e:
         Log.error(TAG, "Connection Error for request:\n" + e.request.url + "\n" + str(e.args))
     except Exception as e:
         print("Now really panic!")
         Log.error(TAG, "General http get error!\n" + str(e))
     return None
+
+
+def gsm_get(url, params):
+    pass
+
+
+def http_get(url, params):
+    if device_state.networking.get_wifi_status() == CONNECTED:
+        return wifi_get(url, params)
+    else:
+        return gsm_get(url, params)
 
 
 

@@ -1,5 +1,6 @@
 from system.constants import *
 from helpers.kojin_logging import Log
+from system.state import device_state
 import requests
 
 TAG = "Location_Requests"
@@ -48,7 +49,7 @@ def deserialize_err_response(json):
     return ErrResponse(json['status'], json['message'], json['balance'])
 
 
-def http_post(url, params):
+def wifi_post(url, params):
     """ Sends post request to location Api and deserializes the standard response
 
     Args:
@@ -70,4 +71,16 @@ def http_post(url, params):
     except Exception as e:
         print("Now really panic!")
         Log.error(TAG, "General http get error!\n" + str(e))
+
+
+def gsm_post(url, params):
+    pass
+
+
+def http_post(url, params):
+    if device_state.networking.get_wifi_status() == CONNECTED:
+        wifi_post(url, params)
+    else:
+        gsm_post(url, params)
+
 

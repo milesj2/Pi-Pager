@@ -7,7 +7,7 @@ from system.state import device_state
 from system.classes import ALERT_EMPTY, Alert, Location
 from helpers.config import config
 from system import events
-
+from helpers.device_requests import Requests
 
 TAG = "networking.thread"
 
@@ -47,7 +47,13 @@ def search_for_alert():
     }
 
     api_status = True
-    response = http_get(URL_KOJIN_API + URL_ROUTE_KOJIN_API_GET_ALERT, params)
+
+    req = Requests()
+    response = req.http_get(URL_KOJIN_API + URL_ROUTE_KOJIN_API_GET_ALERT, params)
+    if response['value'] == "":
+        response = req.deserialise_response(response['value'], StdResponse)
+    else:
+        response = req.deserialise_response(response, StdResponse)
 
     if response is None:
         alert = ALERT_EMPTY
@@ -57,7 +63,6 @@ def search_for_alert():
     elif response.message == STRING_EMPTY:
         alert = ALERT_EMPTY
     else:
-        # TODO check for multiple shouts and deal with that... If thats a use case
         alert = deserialise_reponse(response.message[0])
     on_update_connection_status(api_status)
     return alert

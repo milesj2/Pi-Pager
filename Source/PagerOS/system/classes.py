@@ -92,8 +92,6 @@ class Menu:
             self.current_item.append(current_item.subitems[self.current_item_index])
             self.current_item_index = 0
         else:
-            # self.on_action(next_item)
-            # self.fire_action_event()
             next_item.action()
 
     def deselect_item(self):
