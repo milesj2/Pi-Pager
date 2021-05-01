@@ -5,6 +5,7 @@ from helpers.kojin_logging import Log
 from system.constants import *
 from system.state import device_state
 from helpers.config import config
+import wifi
 
 TAG = "network_manger"
 
@@ -13,7 +14,7 @@ ADDRESS_LOCAL = "127.0.0.1"
 LAN = "eth0"
 
 
-on_connection_status_update = system.events.Event()
+on_wifi_status_update = system.events.Event()
 
 
 def start():
@@ -54,10 +55,21 @@ def check_wifi():
     Log.debug(TAG, f"Out of {len(if_addrs.items()) - 1} interfaces, {connected_interfaces} were connected.")
     if connected_interfaces > 0:
         # TODO: get wifi strength
-        status = 3
+        status = WIFI_SIGNAL_HIGH
     else:
         Log.debug(TAG, "Device has no connected interfaces!")
-        status = 0
+        status = NO_SIGNAL
     Log.debug(TAG, f"Raising event on_connection_status_update with status: {status}")
-    on_connection_status_update(status)
+    on_wifi_status_update(status)
 
+
+def get_available_wifi_networks():
+    networks = []
+
+    cells = wifi.Cell.all('wlp8s0')
+
+    for cell in cells:
+        networks.append(cell)
+        print(cell.ssid)
+
+    return networks

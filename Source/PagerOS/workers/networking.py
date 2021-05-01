@@ -36,10 +36,6 @@ def raise_alert(alert):
     on_received_alert(alert)
 
 
-def deserialise_reponse(dict):
-    return Alert(dict['id'], dict['shoutID'], dict['pagerID'], dict['stationID'], dict['type'])
-
-
 def search_for_alert():
     Log.debug(TAG, "Searching for alert.")
     params = {
@@ -49,7 +45,9 @@ def search_for_alert():
     api_status = True
 
     req = Requests()
-    response = req.http_get(URL_KOJIN_API + URL_ROUTE_KOJIN_API_GET_ALERT, params)
+    url = URL_KOJIN_API + URL_ROUTE_KOJIN_API_GET_ALERT.format(serial=config.get_serial())
+    response = req.http_get(url, params)
+    print(response)
     if response['value'] == "":
         response = req.deserialise_response(response['value'], StdResponse)
     else:
@@ -63,7 +61,7 @@ def search_for_alert():
     elif response.message == STRING_EMPTY:
         alert = ALERT_EMPTY
     else:
-        alert = deserialise_reponse(response.message[0])
+        alert = req.deserialise_response(response.message[0], Alert)
     on_update_connection_status(api_status)
     return alert
 
@@ -74,8 +72,12 @@ def update_alert_status(alert_id, status):
         URL_PARAM_ALERT_ID: alert_id,
         URL_PARAM_STATUS: status
     }
+
     Log.info(TAG, f"Acknowledging shout {alert_id} as {status}.")
-    response = http_get(URL_KOJIN_API + URL_ROUTE_KOJIN_API_ACKNOWLEDGE_ALERT, params)
+
+    url = URL_KOJIN_API + URL_ROUTE_KOJIN_API_ACKNOWLEDGE_ALERT.format(serial=config.get_serial())
+    response = http_get(url, params)
+
     Log.info(TAG, f"Response from server (code: {response.status}): {response.message}")
     return True
 
@@ -88,8 +90,14 @@ def on_update_location(location: Location):
     }
     Log.info(TAG, f"Updating location gps: {location.gps.long}, {location.gps.lat} | "
                   f"wifi: {location.wifi.long}, {location.wifi.lat}.")
-    # response = http_get(URL_KOJIN_API + URL_ROUTE_KOJIN_API_ACKNOWLEDGE_ALERT, params)
-    # Log.info(TAG, f"Response from server (code: {response.status}): {response.message}")
+
+    req = Requests()
+
+    url = URL_KOJIN_API + URL_ROUTE_KOJIN_API_ACKNOWLEDGE_ALERT.format(config.get_serial())
+    json_response = req.http_get(url, params)
+    response = req.deserialise_response(json_response['value'], StdResponse)
+
+    Log.info(TAG, f"Response from server (code: {response.status}): {response.message}")
 
 
 if __name__ == '__main__':

@@ -50,7 +50,7 @@ def start():
     GPIO.setup(PIN_LEFT_BUTTON, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     GPIO.setup(PIN_RIGHT_BUTTON, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-    # Add main button listener
+    # Add button listeners
     GPIO.add_event_detect(PIN_MAIN_BUTTON, GPIO.FALLING, callback=handle_button_press, bouncetime=500)
     GPIO.add_event_detect(PIN_NEGATIVE_BUTTON, GPIO.FALLING, callback=handle_button_press)
     GPIO.add_event_detect(PIN_LEFT_BUTTON, GPIO.FALLING, callback=handle_button_press)
@@ -114,7 +114,7 @@ def vibrate(length, rest):
 def handle_alert(shout_type):
     """ Event handler for when pager receives an alert """
     if shout_type == ALERT_TYPE_SHOUT:
-        handle_shout()
+        handle_alert_io()
     else:
         handle_test()
 
@@ -156,7 +156,7 @@ def alert_led(flashes):
             time.sleep(flash[1])
 
 
-def handle_shout():
+def handle_alert_io():
     """ All io for alerting user there is a shout is handled here """
     Log.info(TAG, "Setting off alert for a shout!")
     time_started = datetime.now()

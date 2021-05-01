@@ -2,18 +2,16 @@ import system.constants as consts
 from system.events import Event
 
 
-class Alert(object):
+class Alert:
     """ alert object to be populated by json response """
-
-    def __init__(self, alert_id, shout_id, pager_id, station_id, alert_type):
-        self.id = alert_id
-        self.shout_id = shout_id
-        self.pager_id = pager_id
-        self.station_id = station_id
-        self.type = alert_type
+    id = consts.STRING_EMPTY
+    shout_id = consts.STRING_EMPTY
+    pager_id = consts.STRING_EMPTY
+    station_id = consts.STRING_EMPTY
+    type = consts.STRING_EMPTY
 
 
-ALERT_EMPTY = Alert("", "", "", "", "")
+ALERT_EMPTY = Alert()
 
 
 class LongLat:

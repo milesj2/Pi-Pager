@@ -24,6 +24,7 @@ def FindFromSearchList(ssid):
 
 def FindFromSavedList(ssid):
     cell = wifi.Scheme.find('wlp8s0', ssid)
+    wifi.Scheme.all()
     if cell:
         return cell
 

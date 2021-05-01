@@ -39,6 +39,8 @@ def start():
         else:
             time.sleep(5)
 
+class WiFi:
+    pass
 
 def get_wifi_location():
     """ Sends nearby BSSIDs to location api and returns approx location
@@ -48,18 +50,23 @@ def get_wifi_location():
     """
     bssids = ["ac:3b:77:ee:1e:b6", "78:44:76:d3:42:30"]
 
+    wifi_networks = []
+
     Log.info(TAG, "Finding location via WIFI.")
+
+    json_wifi = []
+
+    for wifi in wifi_networks:
+        json_wifi.append({
+                "bssid": wifi.bssid,
+                "channel": wifi.channel,
+                "frequency": wifi.frequency,
+                "signal": wifi.signal
+            })
 
     params = {
         "token": LOCATION_API_KEY,
-        "wifi": [{
-            "bssid": bssids[0],
-            "channel": 11,
-            "frequency": 2462,
-            "signal": -64
-        }, {
-            "bssid": bssids[1]
-        }]
+        "wifi": json_wifi
     }
 
     system_requests = Requests()
@@ -84,24 +91,25 @@ def get_gps_location():
     gps_loc = LongLat(-1, -1)
     Log.info(TAG, f"Waiting for GPS data input.")
     received_data = []
-    for i in range(0, 10):
+    for i in range(0, 50):
         received_data = ser.readline().decode().split(",")
         if received_data[0] == gpgga_info:
             break
-        time.sleep(1)
     if len(received_data) == 0:
         return gps_loc
-    Log.info(TAG, f"Processing GPS data.")
-    nmea_buff = received_data[1:]
-    nmea_latitude = nmea_buff[1]
-    nmea_latitude_direction = nmea_buff[2]
-    nmea_longitude = nmea_buff[3]
-    nmea_longitude_direction = nmea_buff[4]
-    if nmea_latitude != STRING_EMPTY or nmea_longitude != STRING_EMPTY:
-        gps_loc.lat = convert_to_degrees(nmea_latitude, nmea_latitude_direction)
-        gps_loc.long = convert_to_degrees(nmea_longitude, nmea_longitude_direction)
-        Log.info(TAG, f"NMEA Latitude: {gps_loc.lat} | NMEA Longitude: {gps_loc.long}")
-    return gps_loc
+    try:
+        Log.info(TAG, f"Processing GPS data.")
+        nmea_buff = received_data[1:]
+        nmea_latitude = nmea_buff[1]
+        nmea_latitude_direction = nmea_buff[2]
+        nmea_longitude = nmea_buff[3]
+        nmea_longitude_direction = nmea_buff[4]
+        if nmea_latitude != STRING_EMPTY or nmea_longitude != STRING_EMPTY:
+            gps_loc.lat = convert_to_degrees(nmea_latitude, nmea_latitude_direction)
+            gps_loc.long = convert_to_degrees(nmea_longitude, nmea_longitude_direction)
+            Log.info(TAG, f"NMEA Latitude: {gps_loc.lat} | NMEA Longitude: {gps_loc.long}")
+    finally:
+        return gps_loc
 
 
 def convert_to_degrees(raw_value, direction):

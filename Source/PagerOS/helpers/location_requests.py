@@ -31,7 +31,7 @@ def deserialize_std_response(json):
     """ Deserializes the standard response
 
      Args:
-        dct (dictionary): response json
+        json (dictionary): response json
     Return:
         (StdResponse): class made from json
      """

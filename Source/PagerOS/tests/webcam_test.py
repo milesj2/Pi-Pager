@@ -9,28 +9,19 @@ font = cv2.FONT_HERSHEY_PLAIN
 def scan():
     while True:
         _, frame = cap.read()
-
         decoded_objects = pyzbar.decode(frame)
-
         for obj in decoded_objects:
             data = obj.data.decode("utf-8")
             print("Found data:", data)
             if data[0: 7] == "WIFI:S:":
                 return data
-
-            #cv2.putText(frame, str(obj.data), (50, 50), font, 2,
-            #            (255, 0, 0), 3)
-
-        # cv2.imshow("Frame", frame)
-
         key = cv2.waitKey(1)
         if key == 27:
             break
 
 
 def main():
-    wifi_info = scan()
-    wifi_info = "WIFI:S:MeinTurtle;T:WPA;P:**332333*8867villaine;H:false;;"
+    wifi_info = scan()  # "WIFI:S:<<BSSID>>;T:WPA;P:<<PASSPHRASE>>;H:false;;
     print("Found wifi info:", wifi_info)
     print("\n")
     test = wifi_info.split(';')

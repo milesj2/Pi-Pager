@@ -72,5 +72,11 @@ class Config:
     def set_vibrate(self, value):
         self._config_parser.set(INI_HEADER_DEVICE, INI_KEY_VIBRATE, str(value))
 
+    def get_serial(self):
+        return self._config_parser.get(INI_HEADER_PAGER, INI_KEY_SERIAL)
+
+    def set_serial(self, value):
+        self._config_parser.set(INI_HEADER_PAGER, INI_KEY_SERIAL, str(value))
+
 
 config = Config()

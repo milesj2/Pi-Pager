@@ -42,7 +42,7 @@ def main():
     networking.on_received_alert.append(handle_alert)
     networking.on_update_connection_status(device_state.networking.set_api_status)
 
-    network_manager.on_connection_status_update.append(handle_connection_status_update)
+    network_manager.on_wifi_status_update.append(handle_wifi_status_update)
 
     location.on_update_location.append(networking.on_update_location)
 
@@ -103,12 +103,13 @@ def main():
 # ########## EVENTS ####################
 ########################################
 
-def handle_connection_status_update(status):
+def handle_wifi_status_update(status):
     """ Gets a status update and updates display
 
      Args:
          status (str) : status of connection
     """
+    Log.info(TAG, f"Recived status of '{status}'")
     device_state.networking.set_wifi_status(status)
 
 

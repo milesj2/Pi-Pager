@@ -1,4 +1,5 @@
-import device_requests
+import requests
+
 from system.state import device_state
 from system.constants import *
 from helpers.kojin_logging import Log
@@ -40,14 +41,14 @@ def wifi_get(url, params):
         response (StdResponse): deserialized json response
     """
     try:
-        response = device_requests.get(url, params)
+        response = requests.get(url, params)
         # TODO more error handling to do.
         if 'value' in response.json():
             response = deserialize_response(response.json()['value'])
         else:
             response = deserialize_response(response.json())
         return response
-    except device_requests.ConnectionError as e:
+    except requests.ConnectionError as e:
         Log.error(TAG, "Connection Error for request:\n" + e.request.url + "\n" + str(e.args))
     except Exception as e:
         print("Now really panic!")

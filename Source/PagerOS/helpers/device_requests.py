@@ -1,9 +1,8 @@
 import requests
-from system.state import device_state
-from system.constants import *
 from helpers.kojin_logging import Log
 from system.state import device_state
 from system.constants import *
+import urllib3
 
 TAG = "Requests"
 
@@ -11,9 +10,11 @@ TAG = "Requests"
 class Requests:
 
     def __init__(self):
-        if device_state.networking.get_wifi_status() == CONNECTION_STATUS_CONNECTED:
+        if device_state.networking.is_wifi_connected_and_enabled():
+            Log.info(TAG, "Starting Wi-Fi Client")
             self._client = _WifiRequests()
         else:
+            Log.info(TAG, "Starting GSM Client")
             self._client = _GSMRequests()
 
     def http_get(self, url, params):
@@ -30,13 +31,16 @@ class Requests:
 
 
 class _WifiRequests:
-    def http_get(self, url, params ):
+
+    urllib3.disable_warnings()
+
+    def http_get(self, url, params):
         try:
             return requests.get(url, params).json()
         except requests.ConnectionError as e:
             Log.error(TAG, "Connection Error for request:\n" + e.request.url + "\n" + str(e.args))
         except Exception as e:
-            print("Now really panic!")
+            print("General Error!")
             Log.error(TAG, "General http get error!\n" + str(e))
         return None
 
@@ -47,7 +51,7 @@ class _WifiRequests:
         except requests.ConnectionError as e:
             Log.error(TAG, "Connection Error for request:\n" + e.request.url + "\n" + str(e.args))
         except Exception as e:
-            print("Now really panic!")
+            print("General Error!")
             Log.error(TAG, "General http get error!\n" + str(e))
 
 

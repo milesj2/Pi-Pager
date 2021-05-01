@@ -18,6 +18,9 @@ class _Networking:
     def set_wifi_status(self, status):
         self._wifi_status = status
 
+    def is_wifi_connected_and_enabled(self):
+        return self._wifi_status != NO_SIGNAL or config.get_wifi()
+
     def get_current_wifi(self):
         pass
 
